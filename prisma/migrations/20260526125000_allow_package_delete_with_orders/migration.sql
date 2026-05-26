@@ -1,0 +1,8 @@
+ALTER TABLE "Order" DROP CONSTRAINT IF EXISTS "Order_packageId_fkey";
+
+ALTER TABLE "Order" ALTER COLUMN "packageId" DROP NOT NULL;
+
+ALTER TABLE "Order"
+  ADD CONSTRAINT "Order_packageId_fkey"
+  FOREIGN KEY ("packageId") REFERENCES "Package"("id")
+  ON DELETE SET NULL ON UPDATE CASCADE;

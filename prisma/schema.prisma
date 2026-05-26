@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+}
+
+model Package {
+  id          Int      @id @default(autoincrement())
+  name        String
+  category    String   @default("social-media-management")
+  description String
+  price       Float
+  strikePrice Float?
+  duration    String?
+  image       String?
+  features    String   @default("")
+  popular     Boolean  @default(false)
+  badgeType   String   @default("none")
+  badgeText   String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orders Order[]
+  promos PromoPackage[]
+
+  @@index([createdAt])
+}
+
+model Promo {
+  id            Int       @id @default(autoincrement())
+  name          String
+  description   String
+  code          String    @unique
+  discountType  String    @default("percentage")
+  discountValue Float
+  startDate     DateTime?
+  endDate       DateTime?
+  maxUsage      Int?
+  currentUsage  Int       @default(0)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  packages PromoPackage[]
+  orders   Order[]
+
+  @@index([code, isActive])
+  @@index([startDate, endDate])
+}
+
+model LandingContent {
+  id                   Int      @id @default(autoincrement())
+  navbarPromoText      String   @default("PROMO 10% PER TANGGAL 25-27")
+  heroTitle            String   @default("Sebisa Project")
+  heroSubtitle         String   @default("We don't follow markets, we move them")
+  heroCtaText          String   @default("Konsultasikan Sekarang")
+  heroClientsText      String   @default("Dipercaya oleh 100+ client dari berbagai industri")
+  heroBottomHeading    String   @default("Semua strategi dirancang khusus untuk kamu, kamu tinggal terima beres!")
+  heroBottomText       String   @default("Konsultasikan kebutuhan kamu, dan kami akan tangani dan membantu sepenuh cinta dan kasih.")
+  heroBottomButtonText String   @default("Mulai Gratis Sekarang")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@map("landing_contents")
+}
+
+model PromoPackage {
+  id        Int @id @default(autoincrement())
+  promoId   Int
+  packageId Int
+
+  promo   Promo   @relation(fields: [promoId], references: [id], onDelete: Cascade)
+  package Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+
+  @@unique([promoId, packageId])
+}
+
+model Testimonial {
+  id        Int      @id @default(autoincrement())
+  name      String
+  brand     String
+  content   String
+  rating    Int      @default(5)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+model TrustedBrand {
+  id        Int      @id @default(autoincrement())
+  brand     String
+  image     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+model Order {
+  id            Int      @id @default(autoincrement())
+  customerEmail String
+  customerPhone String
+  customerName  String
+  packageId     Int?
+  promoId       Int?
+  totalPrice    Float
+  status        String   @default("pending")
+  transactionId String?
+  paymentProof  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  package Package?    @relation(fields: [packageId], references: [id], onDelete: SetNull)
+  promo   Promo?      @relation(fields: [promoId], references: [id], onDelete: SetNull)
+  items   OrderItem[]
+
+  @@index([customerEmail])
+  @@index([transactionId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id          Int      @id @default(autoincrement())
+  orderId     Int
+  packageId   Int
+  quantity    Int      @default(1)
+  priceAtTime Float
+  createdAt   DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
