@@ -1,5 +1,6 @@
 "use client";
 
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 import { formatCurrency } from "@/lib/client-utils";
@@ -64,6 +65,7 @@ export default function CardPacket({
 }: CardPacketProps) {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
+  const [isPending, startTransition] = useTransition();
   const normalizedBadgeType = (badgeType ?? "none") as BadgeType;
   const isPopular = normalizedBadgeType === "popular";
   const badgeLabel = getBadgeLabel(
@@ -155,7 +157,9 @@ export default function CardPacket({
             </p>
           )}
 
-          <motion.button
+          <button
+            type="button"
+            disabled={isPending}
             onClick={() => {
               const params = new URLSearchParams({ packageId: String(id) });
               const promoCode = getClaimedPromoCode();
@@ -164,22 +168,28 @@ export default function CardPacket({
                 params.set("promo", promoCode);
               }
 
-              router.push(`/checkout?${params.toString()}`);
+              startTransition(() => {
+                router.push(`/checkout?${params.toString()}`);
+              });
             }}
-            whileHover={reduceMotion ? undefined : { scale: 1.03 }}
-            whileTap={reduceMotion ? undefined : { scale: 0.97 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            aria-busy={isPending}
             className="
-              mt-5 min-h-10 w-full rounded-full py-2.5
+              mt-5 inline-flex min-h-10 w-full items-center justify-center rounded-full py-2.5
               text-xs font-bold text-white
-              transition-shadow duration-[400ms]
+              shadow-md shadow-cyan-900/20
+              transition-[box-shadow,filter,opacity] duration-300
               bg-linear-to-b
               from-[#39B2EC]
               to-[#206586]
+              hover:shadow-lg hover:shadow-cyan-400/25
+              hover:brightness-105
+              active:brightness-95
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-[#173472]
+              disabled:cursor-wait disabled:opacity-75
             "
           >
-            Beli Sekarang
-          </motion.button>
+            {isPending ? "Membuka Checkout..." : "Beli Sekarang"}
+          </button>
         </div>
       </motion.div>
     </>
