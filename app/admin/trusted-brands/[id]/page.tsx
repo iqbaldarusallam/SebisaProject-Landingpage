@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { TextInput } from "@/components/admin/FormField";
+import {
+  setAdminToastFlash,
+  useAdminToast,
+} from "@/components/admin/AdminToast";
 
 interface TrustedBrand {
   id: number;
@@ -12,6 +16,7 @@ interface TrustedBrand {
 
 export default function TrustedBrandFormPage() {
   const router = useRouter();
+  const { showToast } = useAdminToast();
   const params = useParams();
   const brandId = Array.isArray(params.id) ? params.id[0] : params.id;
   const isEdit = brandId !== "new";
@@ -93,6 +98,10 @@ export default function TrustedBrandFormPage() {
       }
 
       handleChange("image", data.data.url);
+      showToast({
+        title: "Logo berhasil diupload",
+        message: "URL Cloudinary sudah otomatis masuk ke form.",
+      });
     } catch (error) {
       console.error(error);
       setErrors((prev) => ({
@@ -128,6 +137,12 @@ export default function TrustedBrandFormPage() {
         return;
       }
 
+      setAdminToastFlash({
+        title: isEdit
+          ? "Logo brand berhasil diperbarui"
+          : "Logo brand berhasil dibuat",
+        message: `${formData.brand || "Brand"} sudah tersimpan di daftar logo.`,
+      });
       router.push("/admin/trusted-brands");
     } catch (error) {
       console.error(error);

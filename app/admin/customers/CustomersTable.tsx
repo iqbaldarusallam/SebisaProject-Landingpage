@@ -84,6 +84,46 @@ export function CustomersTable({
       data={customers}
       exportFilename="customers"
       searchPlaceholder="Cari customer..."
+      filters={[
+        {
+          id: "status",
+          label: "Status Terakhir",
+          allLabel: "Semua",
+          options: [
+            { label: "Pending", value: "pending" },
+            { label: "Success", value: "paid" },
+            { label: "Gagal", value: "failed" },
+            { label: "Expired", value: "expired" },
+            { label: "Refund", value: "refunded" },
+          ],
+          getValue: (customer) => customer.latestStatus,
+        },
+        {
+          id: "orderCount",
+          label: "Jumlah Order",
+          allLabel: "Semua Order",
+          display: "select",
+          options: [
+            { label: "1 order", value: "single" },
+            { label: "Repeat order", value: "repeat" },
+          ],
+          getValue: (customer) =>
+            customer.orderCount > 1 ? "repeat" : "single",
+        },
+        {
+          id: "period",
+          label: "Periode",
+          allLabel: "Semua Waktu",
+          display: "select",
+          options: [
+            { label: "Minggu terakhir", value: "last-week" },
+            { label: "Bulan terakhir", value: "last-month" },
+            { label: "Tahun terakhir", value: "last-year" },
+          ],
+          getValue: (customer) =>
+            getRelativeDateBuckets(customer.latestOrderAt),
+        },
+      ]}
       searchFields={(customer) => [
         customer.name,
         customer.email,
@@ -106,4 +146,19 @@ export function CustomersTable({
       })}
     />
   );
+}
+
+function getRelativeDateBuckets(date: string) {
+  const value = new Date(date).getTime();
+  if (!Number.isFinite(value)) return [];
+
+  const now = Date.now();
+  const day = 24 * 60 * 60 * 1000;
+  const buckets: string[] = [];
+
+  if (value >= now - 7 * day) buckets.push("last-week");
+  if (value >= now - 30 * day) buckets.push("last-month");
+  if (value >= now - 365 * day) buckets.push("last-year");
+
+  return buckets;
 }

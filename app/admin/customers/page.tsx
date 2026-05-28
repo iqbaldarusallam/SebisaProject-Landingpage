@@ -24,8 +24,8 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-function getCustomerKey(email: string, phone: string) {
-  return `${email.trim().toLowerCase()}|${phone.trim()}`;
+function getCustomerKey(email: string) {
+  return email.trim().toLowerCase();
 }
 
 export default async function CustomersPage() {
@@ -39,7 +39,7 @@ export default async function CustomersPage() {
   const customers = Array.from(
     orders
       .reduce((map, order) => {
-        const key = getCustomerKey(order.customerEmail, order.customerPhone);
+        const key = getCustomerKey(order.customerEmail);
         const existing = map.get(key);
 
         if (!existing) {
@@ -106,7 +106,7 @@ export default async function CustomersPage() {
             Data Customer
           </h2>
           <p className="text-sm text-slate-500">
-            Satu customer dikelompokkan berdasarkan email dan nomor telepon.
+            Satu customer dikelompokkan berdasarkan email.
           </p>
         </div>
 

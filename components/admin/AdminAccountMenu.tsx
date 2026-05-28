@@ -11,6 +11,7 @@ import {
   FiUser,
   FiX,
 } from "react-icons/fi";
+import { useAdminToast } from "@/components/admin/AdminToast";
 
 type AccountForm = {
   name: string;
@@ -21,6 +22,7 @@ type AccountForm = {
 
 export default function AdminAccountMenu() {
   const { data: session } = useSession();
+  const { showToast } = useAdminToast();
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<AccountForm>({
     name: "",
@@ -68,10 +70,19 @@ export default function AdminAccountMenu() {
 
       if (!res.ok || !data.ok) {
         setError(data.message || "Gagal menyimpan akun");
+        showToast({
+          title: "Akun gagal disimpan",
+          message: data.message || "Periksa kembali data akun.",
+          variant: "error",
+        });
         return;
       }
 
       setMessage("Akun tersimpan. Login ulang untuk memakai data terbaru.");
+      showToast({
+        title: "Akun berhasil disimpan",
+        message: "Silakan login ulang untuk memakai data terbaru.",
+      });
       setFormData((current) => ({
         ...current,
         currentPassword: "",
@@ -83,6 +94,11 @@ export default function AdminAccountMenu() {
     } catch (error) {
       console.error(error);
       setError("Terjadi kesalahan saat menyimpan akun");
+      showToast({
+        title: "Akun gagal disimpan",
+        message: "Terjadi kesalahan saat menyimpan akun.",
+        variant: "error",
+      });
     } finally {
       setSubmitting(false);
     }

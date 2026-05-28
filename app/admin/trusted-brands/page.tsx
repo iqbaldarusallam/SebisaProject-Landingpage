@@ -8,6 +8,7 @@ import {
   DataTable,
   type DataTableColumn,
 } from "@/components/admin/DataTable";
+import { useAdminToast } from "@/components/admin/AdminToast";
 
 interface TrustedBrand {
   id: number;
@@ -18,6 +19,7 @@ interface TrustedBrand {
 
 export default function TrustedBrandsPage() {
   const router = useRouter();
+  const { showToast } = useAdminToast();
   const [brands, setBrands] = useState<TrustedBrand[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -41,17 +43,31 @@ export default function TrustedBrandsPage() {
   }, []);
 
   const handleDelete = async (brand: TrustedBrand) => {
-    if (!confirm(`Delete brand logo "${brand.brand}"?`)) return;
-
     try {
       const res = await fetch(`/api/trusted-brands/${brand.id}`, {
         method: "DELETE",
       });
-      if (!res.ok) throw new Error("Delete failed");
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.message || "Gagal menghapus logo brand");
+      }
+
       setBrands(brands.filter((item) => item.id !== brand.id));
+      showToast({
+        title: "Logo brand berhasil dihapus",
+        message: `${brand.brand} sudah dihapus dari daftar logo.`,
+      });
     } catch (error) {
       console.error(error);
-      alert("Gagal menghapus brand logo");
+      showToast({
+        title: "Logo brand gagal dihapus",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Terjadi kesalahan saat menghapus logo brand.",
+        variant: "error",
+      });
     }
   };
 

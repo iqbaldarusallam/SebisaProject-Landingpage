@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { TextInput, TextArea, FormField } from "@/components/admin/FormField";
+import { setAdminToastFlash } from "@/components/admin/AdminToast";
 import { PACKAGE_CATEGORIES } from "@/lib/package-categories";
 
 interface Package {
@@ -11,7 +12,7 @@ interface Package {
   category: string;
   description: string;
   price: number;
-  strikePrice: number | null;
+  salePrice: number | null;
   duration: string;
   features: string;
   popular: boolean;
@@ -31,7 +32,7 @@ export default function PackageFormPage() {
     category: "social-media-management",
     description: "",
     price: 0,
-    strikePrice: null,
+    salePrice: null,
     duration: "",
     features: "",
     popular: false,
@@ -50,24 +51,25 @@ export default function PackageFormPage() {
       const res = await fetch(`/api/packages/${packageId}`);
       const data = await res.json();
       if (!res.ok || !data.ok) {
-        throw new Error(data.message || "Gagal memuat package");
+        throw new Error(data.message || "Gagal memuat paket");
       }
       setFormData({
         name: data.data.name ?? "",
         category: data.data.category ?? "social-media-management",
         description: data.data.description ?? "",
         price: data.data.price ?? 0,
-        strikePrice: data.data.strikePrice ?? null,
+        salePrice: data.data.salePrice ?? null,
         duration: data.data.duration ?? "",
         features: normalizeFeatureText(data.data.features ?? ""),
         popular: data.data.popular ?? false,
-        badgeType: data.data.badgeType ?? (data.data.popular ? "popular" : "none"),
+        badgeType:
+          data.data.badgeType ?? (data.data.popular ? "popular" : "none"),
         badgeText: data.data.badgeText ?? null,
         order: data.data.order ?? 0,
       });
     } catch (error) {
       console.error(error);
-      setErrors({ form: "Gagal memuat package" });
+      setErrors({ form: "Gagal memuat paket" });
     } finally {
       setLoading(false);
     }
@@ -104,8 +106,7 @@ export default function PackageFormPage() {
       const payload = {
         ...formData,
         popular: formData.badgeType === "popular",
-        badgeText:
-          formData.badgeType === "custom" ? formData.badgeText : null,
+        badgeText: formData.badgeType === "custom" ? formData.badgeText : null,
       };
 
       const res = await fetch(url, {
@@ -120,11 +121,15 @@ export default function PackageFormPage() {
         if (data.errors) {
           setErrors(data.errors);
         } else {
-          setErrors({ form: data.message || "Gagal menyimpan package" });
+          setErrors({ form: data.message || "Gagal menyimpan paket" });
         }
         return;
       }
 
+      setAdminToastFlash({
+        title: isEdit ? "Paket berhasil diperbarui" : "Paket berhasil dibuat",
+        message: `${formData.name || "Data paket"} sudah tersimpan di katalog.`,
+      });
       router.push("/admin/packages");
     } catch (error) {
       console.error(error);
@@ -135,14 +140,14 @@ export default function PackageFormPage() {
   };
 
   if (loading) {
-    return <div className="text-center">Loading...</div>;
+    return <div className="text-center">Memuat...</div>;
   }
 
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">
-          {isEdit ? "Edit Package" : "Add New Package"}
+          {isEdit ? "Edit Paket" : "Tambah Paket"}
         </h1>
       </div>
 
@@ -157,14 +162,14 @@ export default function PackageFormPage() {
         )}
 
         <TextInput
-          label="Package Name"
+          label="Nama Paket"
           value={formData.name}
           onChange={(e) => handleChange("name", e.target.value)}
           error={errors.name}
           required
         />
 
-        <FormField label="Category" error={errors.category}>
+        <FormField label="Kategori" error={errors.category}>
           <select
             value={formData.category}
             onChange={(e) => handleChange("category", e.target.value)}
@@ -180,7 +185,7 @@ export default function PackageFormPage() {
         </FormField>
 
         <TextArea
-          label="Description"
+          label="Deskripsi"
           value={formData.description}
           onChange={(e) => handleChange("description", e.target.value)}
           error={errors.description}
@@ -189,7 +194,7 @@ export default function PackageFormPage() {
         />
 
         <TextInput
-          label="Price (Rp)"
+          label="Harga Normal (Rp)"
           type="number"
           value={formData.price}
           onChange={(e) => handleChange("price", Number(e.target.value))}
@@ -198,49 +203,45 @@ export default function PackageFormPage() {
         />
 
         <TextInput
-          label="Strike Price / Harga Coret (Rp)"
+          label="Harga Promo (Rp)"
           type="number"
-          value={formData.strikePrice ?? ""}
+          value={formData.salePrice ?? ""}
           onChange={(e) =>
             handleChange(
-              "strikePrice",
+              "salePrice",
               e.target.value ? Number(e.target.value) : null,
             )
           }
-          error={errors.strikePrice}
-          placeholder="Kosongkan jika tidak ada harga coret"
+          error={errors.salePrice}
+          placeholder="Kosongkan jika tidak ada harga promo"
         />
 
         <TextInput
-          label="Duration"
-          placeholder="e.g., 1 Month, 3 Months, 6 Months"
+          label="Durasi"
+          placeholder="Contoh: 1 bulan, 7 hari kerja"
           value={formData.duration}
           onChange={(e) => handleChange("duration", e.target.value)}
           error={errors.duration}
-          required
         />
 
         <FormField label="Badge Paket" error={errors.badgeType}>
           <select
             value={formData.badgeType ?? "none"}
             onChange={(e) =>
-              handleChange(
-                "badgeType",
-                e.target.value as Package["badgeType"],
-              )
+              handleChange("badgeType", e.target.value as Package["badgeType"])
             }
             className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-transparent focus:ring-2 focus:ring-[#173472]"
           >
             <option value="none">Tidak ada badge</option>
-            <option value="popular">Popular</option>
-            <option value="discount">Hemat otomatis dari harga coret</option>
-            <option value="custom">Other / isi sendiri</option>
+            <option value="popular">Populer</option>
+            <option value="discount">Hemat dari sale price</option>
+            <option value="custom">Isi sendiri</option>
           </select>
         </FormField>
 
         {formData.badgeType === "custom" && (
           <TextInput
-            label="Custom Badge Text"
+            label="Teks Badge Custom"
             value={formData.badgeText ?? ""}
             onChange={(e) => handleChange("badgeText", e.target.value)}
             error={errors.badgeText}
@@ -248,21 +249,20 @@ export default function PackageFormPage() {
           />
         )}
 
-        <FormField label="Features" error={errors.features}>
+        <FormField label="Fitur Paket" error={errors.features}>
           <textarea
             value={formData.features ?? ""}
             onChange={(e) => handleChange("features", e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#173472] focus:border-transparent outline-none"
             rows={6}
-            placeholder={"Landing page 1 halaman\nCopywriting penawaran\nForm guest checkout"}
+            placeholder={
+              "Landing page 1 halaman\nCopywriting penawaran\nForm guest checkout"
+            }
           />
-          <p className="text-xs text-gray-500 mt-1">
-            Tulis satu fitur per baris. Tidak perlu format JSON.
-          </p>
         </FormField>
 
         <TextInput
-          label="Display Order"
+          label="Urutan Tampil"
           type="number"
           value={formData.order}
           onChange={(e) => handleChange("order", Number(e.target.value))}
@@ -275,14 +275,14 @@ export default function PackageFormPage() {
             disabled={submitting}
             className="bg-[#173472] text-white px-6 py-2 rounded-lg hover:bg-[#131C36] transition-colors disabled:opacity-50"
           >
-            {submitting ? "Saving..." : "Save Package"}
+            {submitting ? "Menyimpan..." : "Simpan Paket"}
           </button>
           <button
             type="button"
             onClick={() => router.back()}
             className="bg-gray-300 text-gray-900 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors"
           >
-            Cancel
+            Batal
           </button>
         </div>
       </form>

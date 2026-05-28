@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { TextInput, TextArea } from "@/components/admin/FormField";
+import { useAdminToast } from "@/components/admin/AdminToast";
 
 interface LandingContent {
   id?: number;
@@ -31,6 +32,7 @@ const initialState: LandingContent = {
 
 export default function ContentPage() {
   const router = useRouter();
+  const { showToast } = useAdminToast();
   const [formData, setFormData] = useState<LandingContent>(initialState);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
@@ -82,16 +84,27 @@ export default function ContentPage() {
         if (data.errors) {
           setErrors(data.errors);
         } else {
-          alert(data.message || "Gagal menyimpan konten");
+          showToast({
+            title: "Konten gagal disimpan",
+            message: data.message || "Periksa kembali data yang diisi.",
+            variant: "error",
+          });
         }
         return;
       }
 
-      alert("Konten landing page berhasil disimpan");
+      showToast({
+        title: "Konten berhasil disimpan",
+        message: "Copywriting landing page sudah diperbarui.",
+      });
       router.refresh();
     } catch (error) {
       console.error(error);
-      alert("Terjadi kesalahan saat menyimpan konten");
+      showToast({
+        title: "Konten gagal disimpan",
+        message: "Terjadi kesalahan saat menyimpan konten.",
+        variant: "error",
+      });
     } finally {
       setSubmitting(false);
     }

@@ -9,6 +9,7 @@ import {
 import { getPackageCategoryTitle } from "@/lib/package-categories";
 import { useRouter } from "next/navigation";
 import { FiPlus } from "react-icons/fi";
+import { useAdminToast } from "@/components/admin/AdminToast";
 
 interface Package {
   id: number;
@@ -16,7 +17,7 @@ interface Package {
   category: string;
   description: string;
   price: number;
-  strikePrice?: number | null;
+  salePrice?: number | null;
   popular: boolean;
   badgeType: string;
   badgeText?: string | null;
@@ -27,6 +28,7 @@ interface Package {
 
 export default function PackagesPage() {
   const router = useRouter();
+  const { showToast } = useAdminToast();
   const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -39,7 +41,7 @@ export default function PackagesPage() {
       setPackages(data.data || []);
     } catch (error) {
       console.error(error);
-      setError("Gagal memuat packages");
+      setError("Gagal memuat paket");
     } finally {
       setLoading(false);
     }
@@ -50,34 +52,48 @@ export default function PackagesPage() {
   }, []);
 
   const handleDelete = async (pkg: Package) => {
-    if (!confirm(`Delete package "${pkg.name}"?`)) return;
-
     try {
       const res = await fetch(`/api/packages/${pkg.id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Delete failed");
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.message || "Gagal menghapus paket");
+      }
+
       setPackages(packages.filter((p) => p.id !== pkg.id));
+      showToast({
+        title: "Paket berhasil dihapus",
+        message: `${pkg.name} sudah dihapus dari katalog.`,
+      });
     } catch (error) {
       console.error(error);
-      alert("Gagal menghapus package");
+      showToast({
+        title: "Paket gagal dihapus",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Terjadi kesalahan saat menghapus paket.",
+        variant: "error",
+      });
     }
   };
 
   const columns: DataTableColumn<Package>[] = [
-    { key: "name" as const, label: "Name" },
+    { key: "name" as const, label: "Nama" },
     {
       key: "category" as const,
-      label: "Category",
+      label: "Kategori",
       render: (value) => getPackageCategoryTitle(String(value)),
     },
-    { key: "description" as const, label: "Description" },
+    { key: "description" as const, label: "Deskripsi" },
     {
       key: "price" as const,
-      label: "Price",
+      label: "Harga Normal",
       render: (value) => `Rp${Number(value).toLocaleString("id-ID")}`,
     },
     {
-      key: "strikePrice" as const,
-      label: "Harga Coret",
+      key: "salePrice" as const,
+      label: "Harga Promo",
       render: (value) =>
         value ? `Rp${Number(value).toLocaleString("id-ID")}` : "-",
     },
@@ -86,23 +102,23 @@ export default function PackagesPage() {
       label: "Badge",
       render: (value, row) => getBadgeLabel(String(value), row.badgeText),
     },
-    { key: "duration" as const, label: "Duration" },
-    { key: "order" as const, label: "Order" },
+    { key: "duration" as const, label: "Durasi" },
+    { key: "order" as const, label: "Urutan" },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Packages</h1>
-          <p className="text-gray-600">Manage service packages</p>
+          <h1 className="text-3xl font-bold text-gray-900">Paket</h1>
+          <p className="text-gray-600">Kelola paket layanan</p>
         </div>
         <Link
           href="/admin/packages/new"
           className="inline-flex items-center gap-2 rounded-lg bg-[#173472] px-4 py-2 text-white transition-colors hover:bg-[#131C36]"
         >
           <FiPlus aria-hidden />
-          Add Package
+          Tambah Paket
         </Link>
       </div>
 
@@ -117,26 +133,27 @@ export default function PackagesPage() {
         data={packages}
         loading={loading}
         exportFilename="packages"
-        searchPlaceholder="Cari package..."
+        searchPlaceholder="Cari paket..."
         searchFields={(pkg) => [
           pkg.name,
           getPackageCategoryTitle(pkg.category),
           pkg.description,
           pkg.price,
-          pkg.strikePrice,
+          pkg.salePrice,
           pkg.duration,
+          pkg.order,
           getBadgeLabel(pkg.badgeType, pkg.badgeText),
         ]}
         exportRow={(pkg) => ({
           ID: pkg.id,
-          Name: pkg.name,
-          Category: getPackageCategoryTitle(pkg.category),
-          Description: pkg.description,
-          Price: pkg.price,
-          "Harga Coret": pkg.strikePrice ?? null,
+          Nama: pkg.name,
+          Kategori: getPackageCategoryTitle(pkg.category),
+          Deskripsi: pkg.description,
+          "Harga Normal": pkg.price,
+          "Harga Promo": pkg.salePrice ?? null,
           Badge: getBadgeLabel(pkg.badgeType, pkg.badgeText),
-          Duration: pkg.duration ?? "",
-          Order: pkg.order,
+          Durasi: pkg.duration ?? "",
+          Urutan: pkg.order,
           "Dibuat Pada": new Date(pkg.createdAt).toLocaleString("id-ID"),
         })}
         onEdit={(pkg) => router.push(`/admin/packages/${pkg.id}`)}
@@ -147,8 +164,8 @@ export default function PackagesPage() {
 }
 
 function getBadgeLabel(type: string, text?: string | null) {
-  if (type === "popular") return "Popular";
-  if (type === "discount") return "Hemat otomatis";
-  if (type === "custom") return text || "Custom";
+  if (type === "popular") return "Populer";
+  if (type === "discount") return "Hemat";
+  if (type === "custom") return text || "Kustom";
   return "-";
 }

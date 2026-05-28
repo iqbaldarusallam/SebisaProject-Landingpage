@@ -19,17 +19,18 @@ import {
 } from "react-icons/fi";
 import type { IconType } from "react-icons";
 import AdminAccountMenu from "@/components/admin/AdminAccountMenu";
+import { AdminToastProvider } from "@/components/admin/AdminToast";
 
 const navigation: Array<{ name: string; href: string; icon: IconType }> = [
   { name: "Dashboard", href: "/admin/dashboard", icon: FiHome },
-  { name: "Admins", href: "/admin/admins", icon: FiUsers },
-  { name: "Packages", href: "/admin/packages", icon: FiBox },
+  { name: "Admin", href: "/admin/admins", icon: FiUsers },
+  { name: "Paket", href: "/admin/packages", icon: FiBox },
   { name: "Promos", href: "/admin/promos", icon: FiGift },
-  { name: "Testimonials", href: "/admin/testimonials", icon: FiMessageSquare },
-  { name: "Brand Logos", href: "/admin/trusted-brands", icon: FiImage },
-  { name: "Customers", href: "/admin/customers", icon: FiBriefcase },
-  { name: "Content", href: "/admin/content", icon: FiFileText },
-  { name: "Orders", href: "/admin/orders", icon: FiShoppingCart },
+  { name: "Testimoni", href: "/admin/testimonials", icon: FiMessageSquare },
+  { name: "Logo Brand", href: "/admin/trusted-brands", icon: FiImage },
+  { name: "Customer", href: "/admin/customers", icon: FiBriefcase },
+  { name: "Konten", href: "/admin/content", icon: FiFileText },
+  { name: "Order", href: "/admin/orders", icon: FiShoppingCart },
 ];
 
 export default function AdminLayout({
@@ -39,7 +40,9 @@ export default function AdminLayout({
 }) {
   return (
     <SessionProvider>
-      <AdminShell>{children}</AdminShell>
+      <AdminToastProvider>
+        <AdminShell>{children}</AdminShell>
+      </AdminToastProvider>
     </SessionProvider>
   );
 }
@@ -70,7 +73,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
               Sebisa
             </p>
             <h2 className="mt-1 text-xl font-black text-[#173472]">
-              Admin Panel
+              Panel Admin
             </h2>
           </div>
 
@@ -105,7 +108,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
           </nav>
 
           <div className="border-t border-slate-200 p-4">
-            <p className="text-xs font-medium text-slate-500">Logged in as</p>
+            <p className="text-xs font-medium text-slate-500">Login sebagai</p>
             <p className="mt-1 truncate text-sm font-bold text-slate-800">
               {session?.user?.email ?? "Admin"}
             </p>
@@ -116,7 +119,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
               className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-red-700"
             >
               <FiLogOut aria-hidden />
-              Logout
+              Keluar
             </button>
           </div>
         </div>
@@ -141,7 +144,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
               Menu
             </button>
             <div className="hidden text-xs font-semibold text-slate-500 lg:block">
-              Admin workspace
+              Workspace admin
             </div>
             <div className="flex items-center gap-2">
               <div className="hidden text-xs font-semibold text-slate-600 sm:block">

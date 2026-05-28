@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { TextInput, TextArea } from "@/components/admin/FormField";
+import { setAdminToastFlash } from "@/components/admin/AdminToast";
 
 interface Testimonial {
   id: number;
@@ -99,6 +100,12 @@ export default function TestimonialFormPage() {
         return;
       }
 
+      setAdminToastFlash({
+        title: isEdit
+          ? "Testimoni berhasil diperbarui"
+          : "Testimoni berhasil dibuat",
+        message: `Testimoni dari ${formData.name || "klien"} sudah tersimpan.`,
+      });
       router.push("/admin/testimonials");
     } catch (error) {
       console.error(error);

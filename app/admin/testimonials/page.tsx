@@ -8,6 +8,7 @@ import {
 } from "@/components/admin/DataTable";
 import { useRouter } from "next/navigation";
 import { FiPlus } from "react-icons/fi";
+import { useAdminToast } from "@/components/admin/AdminToast";
 
 interface Testimonial {
   id: number;
@@ -20,6 +21,7 @@ interface Testimonial {
 
 export default function TestimonialsPage() {
   const router = useRouter();
+  const { showToast } = useAdminToast();
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -43,17 +45,31 @@ export default function TestimonialsPage() {
   }, []);
 
   const handleDelete = async (testimonial: Testimonial) => {
-    if (!confirm(`Delete testimonial dari "${testimonial.name}"?`)) return;
-
     try {
       const res = await fetch(`/api/testimonials/${testimonial.id}`, {
         method: "DELETE",
       });
-      if (!res.ok) throw new Error("Delete failed");
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.message || "Gagal menghapus testimoni");
+      }
+
       setTestimonials(testimonials.filter((t) => t.id !== testimonial.id));
+      showToast({
+        title: "Testimoni berhasil dihapus",
+        message: `Testimoni dari ${testimonial.name} sudah dihapus.`,
+      });
     } catch (error) {
       console.error(error);
-      alert("Gagal menghapus testimonial");
+      showToast({
+        title: "Testimoni gagal dihapus",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Terjadi kesalahan saat menghapus testimoni.",
+        variant: "error",
+      });
     }
   };
 

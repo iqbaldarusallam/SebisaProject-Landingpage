@@ -8,6 +8,7 @@ import {
   Select,
   FormField,
 } from "@/components/admin/FormField";
+import { setAdminToastFlash } from "@/components/admin/AdminToast";
 
 interface Promo {
   id: number;
@@ -23,6 +24,12 @@ interface Promo {
 }
 
 type PromoValue = string | number | boolean | number[];
+type PackageScope = "all" | "selected";
+
+interface PackageOption {
+  id: number;
+  name: string;
+}
 
 export default function PromoFormPage() {
   const router = useRouter();
@@ -46,6 +53,26 @@ export default function PromoFormPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [packages, setPackages] = useState<PackageOption[]>([]);
+  const [packageScope, setPackageScope] = useState<PackageScope>("all");
+  const formTitle = isEdit ? "Edit Kupon Promo" : "Add Kupon Promo";
+
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const res = await fetch("/api/packages");
+        const data = await res.json();
+
+        if (res.ok && data.ok) {
+          setPackages(data.data ?? []);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchPackages();
+  }, []);
 
   useEffect(() => {
     if (!isEdit || !promoId) return;
@@ -61,6 +88,13 @@ export default function PromoFormPage() {
           throw new Error(data.message || "Gagal memuat promo");
         }
 
+        const selectedPackageIds =
+          data.data.packages?.map(
+            (item: { packageId: number }) => item.packageId,
+          ) ?? [];
+
+        setPackageScope(selectedPackageIds.length > 0 ? "selected" : "all");
+
         setFormData({
           name: data.data.name ?? "",
           description: data.data.description ?? "",
@@ -72,10 +106,7 @@ export default function PromoFormPage() {
             ? String(data.data.startDate).slice(0, 16)
             : "",
           endDate: data.data.endDate ? String(data.data.endDate).slice(0, 16) : "",
-          packageIds:
-            data.data.packages?.map(
-              (item: { packageId: number }) => item.packageId,
-            ) ?? [],
+          packageIds: selectedPackageIds,
         });
       } catch (error) {
         console.error(error);
@@ -112,16 +143,33 @@ export default function PromoFormPage() {
     setErrors({});
 
     try {
+      if (packageScope === "selected" && !formData.packageIds?.length) {
+        setErrors({ packageIds: "Pilih minimal satu paket" });
+        return;
+      }
+
       const method = isEdit ? "PUT" : "POST";
 
       const url = isEdit ? `/api/promos/${promoId}` : "/api/promos";
+      const existingCode = formData.code?.toString().trim().toUpperCase();
+
+      if (!existingCode || existingCode.startsWith("AUTO-")) {
+        setErrors({ code: "Kode kupon wajib diisi" });
+        return;
+      }
+
+      const payload = {
+        ...formData,
+        code: existingCode,
+        packageIds: packageScope === "all" ? [] : formData.packageIds,
+      };
 
       const res = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -136,6 +184,12 @@ export default function PromoFormPage() {
         return;
       }
 
+      setAdminToastFlash({
+        title: isEdit
+          ? "Kupon promo berhasil diperbarui"
+          : "Kupon promo berhasil dibuat",
+        message: `Kode ${existingCode} sudah tersimpan dan siap digunakan sesuai pengaturan.`,
+      });
       router.push("/admin/promos");
     } catch (error) {
       console.error(error);
@@ -153,7 +207,7 @@ export default function PromoFormPage() {
     <div className="max-w-2xl">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">
-          {isEdit ? "Edit Promo" : "Add New Promo"}
+          {formTitle}
         </h1>
       </div>
 
@@ -168,7 +222,7 @@ export default function PromoFormPage() {
         )}
 
         <TextInput
-          label="Promo Name"
+          label="Nama Campaign"
           value={formData.name}
           onChange={(e) => handleChange("name", e.target.value)}
           error={errors.name}
@@ -176,10 +230,11 @@ export default function PromoFormPage() {
         />
 
         <TextInput
-          label="Promo Code"
-          placeholder="e.g., SAVE50"
-          value={formData.code}
+          label="Kode Kupon"
+          placeholder="Contoh: SAVE50"
+          value={formData.code?.startsWith("AUTO-") ? "" : formData.code}
           onChange={(e) => handleChange("code", e.target.value.toUpperCase())}
+          autoCapitalize="characters"
           error={errors.code}
           required
         />
@@ -195,24 +250,24 @@ export default function PromoFormPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <Select
-            label="Discount Type"
+            label="Jenis Potongan"
             value={formData.discountType}
             onChange={(e) => handleChange("discountType", e.target.value)}
             options={[
               {
                 value: "percentage",
-                label: "Percentage (%)",
+                label: "Persentase (%)",
               },
               {
                 value: "fixed",
-                label: "Fixed Amount (Rp)",
+                label: "Nominal Tetap (Rp)",
               },
             ]}
             error={errors.discountType}
           />
 
           <TextInput
-            label="Discount Value"
+            label="Nilai Potongan"
             type="number"
             value={formData.discountValue}
             onChange={(e) =>
@@ -252,6 +307,71 @@ export default function PromoFormPage() {
 
             <span className="text-gray-700">Active</span>
           </label>
+        </FormField>
+
+        <FormField label="Berlaku Untuk Paket" error={errors.packageIds}>
+          <div className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 p-3 text-sm font-semibold text-slate-700">
+                <input
+                  type="radio"
+                  name="packageScope"
+                  checked={packageScope === "all"}
+                  onChange={() => {
+                    setPackageScope("all");
+                    handleChange("packageIds", []);
+                  }}
+                />
+                Semua paket
+              </label>
+
+              <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 p-3 text-sm font-semibold text-slate-700">
+                <input
+                  type="radio"
+                  name="packageScope"
+                  checked={packageScope === "selected"}
+                  onChange={() => setPackageScope("selected")}
+                />
+                Paket tertentu
+              </label>
+            </div>
+
+            {packageScope === "selected" && (
+              <div className="max-h-64 space-y-2 overflow-y-auto rounded-lg border border-slate-200 p-3">
+                {packages.length > 0 ? (
+                  packages.map((pkg) => {
+                    const selectedIds = formData.packageIds ?? [];
+                    const checked = selectedIds.includes(pkg.id);
+
+                    return (
+                      <label
+                        key={pkg.id}
+                        className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(e) => {
+                            handleChange(
+                              "packageIds",
+                              e.target.checked
+                                ? [...selectedIds, pkg.id]
+                                : selectedIds.filter((id) => id !== pkg.id),
+                            );
+                          }}
+                        />
+                        <span>{pkg.name}</span>
+                      </label>
+                    );
+                  })
+                ) : (
+                  <p className="text-sm text-slate-500">
+                    Belum ada paket tersedia.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
         </FormField>
 
         <div className="flex gap-4">

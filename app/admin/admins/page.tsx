@@ -6,6 +6,7 @@ import {
   DataTable,
   type DataTableColumn,
 } from "@/components/admin/DataTable";
+import { useAdminToast } from "@/components/admin/AdminToast";
 import { Select, TextInput } from "@/components/admin/FormField";
 
 interface Admin {
@@ -40,6 +41,7 @@ function getRoleLabel(role: string) {
 }
 
 export default function AdminsPage() {
+  const { showToast } = useAdminToast();
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [formData, setFormData] = useState<AdminForm>(emptyForm);
   const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null);
@@ -83,25 +85,38 @@ export default function AdminsPage() {
 
   const handleDelete = async (admin: Admin) => {
     if (admin.role === "super_admin") {
-      alert("Super admin utama tidak boleh dihapus");
+      showToast({
+        title: "Admin tidak bisa dihapus",
+        message: "Super admin utama tidak boleh dihapus.",
+        variant: "error",
+      });
       return;
     }
-
-    if (!confirm(`Delete admin "${admin.email}"?`)) return;
 
     try {
       const res = await fetch(`/api/admins/${admin.id}`, { method: "DELETE" });
       const data = await res.json();
 
       if (!res.ok || !data.ok) {
-        throw new Error(data.message || "Delete failed");
+        throw new Error(data.message || "Gagal menghapus admin");
       }
 
       setAdmins((current) => current.filter((item) => item.id !== admin.id));
       if (editingAdmin?.id === admin.id) resetForm();
+      showToast({
+        title: "Admin berhasil dihapus",
+        message: `${admin.email} sudah tidak memiliki akses admin.`,
+      });
     } catch (error) {
       console.error(error);
-      alert(error instanceof Error ? error.message : "Gagal menghapus admin");
+      showToast({
+        title: "Admin gagal dihapus",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Terjadi kesalahan saat menghapus admin.",
+        variant: "error",
+      });
     }
   };
 
@@ -137,6 +152,12 @@ export default function AdminsPage() {
         setAdmins((current) => [data.data, ...current]);
       }
 
+      showToast({
+        title: editingAdmin
+          ? "Admin berhasil diperbarui"
+          : "Admin berhasil dibuat",
+        message: `${data.data.email} sudah tersimpan di daftar admin.`,
+      });
       resetForm();
     } catch (error) {
       console.error(error);

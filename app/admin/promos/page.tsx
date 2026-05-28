@@ -8,6 +8,7 @@ import {
 } from "@/components/admin/DataTable";
 import { useRouter } from "next/navigation";
 import { FiPlus } from "react-icons/fi";
+import { useAdminToast } from "@/components/admin/AdminToast";
 
 interface Promo {
   id: number;
@@ -18,10 +19,17 @@ interface Promo {
   code: string;
   isActive: boolean;
   createdAt: string;
+  packages?: Array<{
+    packageId: number;
+    package?: {
+      name: string;
+    };
+  }>;
 }
 
 export default function PromosPage() {
   const router = useRouter();
+  const { showToast } = useAdminToast();
   const [promos, setPromos] = useState<Promo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -32,7 +40,11 @@ export default function PromosPage() {
         setLoading(true);
         const res = await fetch("/api/promos");
         const data = await res.json();
-        setPromos(data.data || []);
+        setPromos(
+          (data.data || []).filter(
+            (promo: Promo) => !promo.code.startsWith("AUTO-"),
+          ),
+        );
       } catch (error) {
         console.error(error);
         setError("Gagal memuat promos");
@@ -45,15 +57,29 @@ export default function PromosPage() {
   }, []);
 
   const handleDelete = async (promo: Promo) => {
-    if (!confirm(`Delete promo "${promo.name}"?`)) return;
-
     try {
       const res = await fetch(`/api/promos/${promo.id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Delete failed");
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.message || "Gagal menghapus promo");
+      }
+
       setPromos(promos.filter((p) => p.id !== promo.id));
+      showToast({
+        title: "Kupon promo berhasil dihapus",
+        message: `${promo.name} sudah dihapus dari daftar promo.`,
+      });
     } catch (error) {
       console.error(error);
-      alert("Gagal menghapus promo");
+      showToast({
+        title: "Kupon promo gagal dihapus",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Terjadi kesalahan saat menghapus promo.",
+        variant: "error",
+      });
     }
   };
 
@@ -74,6 +100,17 @@ export default function PromosPage() {
       label: "Status",
       render: (v) => (Boolean(v) ? "Active" : "Inactive"),
     },
+    {
+      key: "packages" as const,
+      label: "Paket",
+      render: (_value, row) =>
+        row.packages?.length
+          ? row.packages
+              .map((item) => item.package?.name)
+              .filter(Boolean)
+              .join(", ")
+          : "Semua paket",
+    },
   ];
 
   return (
@@ -85,10 +122,10 @@ export default function PromosPage() {
         </div>
         <Link
           href="/admin/promos/new"
-          className="inline-flex items-center gap-2 rounded-lg bg-[#173472] px-4 py-2 text-white transition-colors hover:bg-[#131C36]"
+          className="inline-flex items-center gap-2 rounded-lg bg-[#173472] px-4 py-2 font-semibold text-white transition-colors hover:bg-[#131C36]"
         >
           <FiPlus aria-hidden />
-          Add Promo
+          Add Kupon Promo
         </Link>
       </div>
 
@@ -111,6 +148,12 @@ export default function PromosPage() {
           promo.discountType,
           promo.discountValue,
           promo.isActive ? "Active" : "Inactive",
+          promo.packages?.length
+            ? promo.packages
+                .map((item) => item.package?.name)
+                .filter(Boolean)
+                .join(", ")
+            : "Semua paket",
         ]}
         exportRow={(promo) => ({
           ID: promo.id,
@@ -123,6 +166,12 @@ export default function PromosPage() {
               ? `${promo.discountValue}%`
               : promo.discountValue,
           Status: promo.isActive ? "Active" : "Inactive",
+          Paket: promo.packages?.length
+            ? promo.packages
+                .map((item) => item.package?.name)
+                .filter(Boolean)
+                .join(", ")
+            : "Semua paket",
           "Dibuat Pada": new Date(promo.createdAt).toLocaleString("id-ID"),
         })}
         onEdit={(promo) => router.push(`/admin/promos/${promo.id}`)}
