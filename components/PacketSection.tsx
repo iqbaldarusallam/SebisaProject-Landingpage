@@ -22,7 +22,9 @@ function parseFeatures(features: string) {
 }
 
 export default async function PacketSection() {
-  const packages = await prisma.package.findMany({ orderBy: { order: "asc" } });
+  const packages = await prisma.package.findMany({
+    orderBy: { order: "asc" },
+  });
 
   return (
     <section id="paket" className="bg-[#E9E9E9] px-5 py-16 sm:py-20">
@@ -58,25 +60,32 @@ export default async function PacketSection() {
                   </MotionReveal>
 
                   <div className="grid grid-cols-2 gap-3 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
-                    {categoryPackages.map((item, index) => (
-                      <MotionReveal
-                        key={item.id}
-                        className="min-w-0"
-                        delay={index * 0.08}
-                      >
-                        <CardPacket
-                          id={item.id}
-                          badgeType={item.badgeType}
-                          badgeText={item.badgeText ?? undefined}
-                          title={item.name}
-                          price={item.price}
-                          oldPrice={item.strikePrice ?? undefined}
-                          duration={item.duration ?? undefined}
-                          description={item.description}
-                          features={parseFeatures(item.features)}
-                        />
-                      </MotionReveal>
-                    ))}
+                    {categoryPackages.map((item, index) => {
+                      const hasSalePrice =
+                        item.salePrice !== null &&
+                        item.salePrice !== undefined &&
+                        item.salePrice < item.price;
+
+                      return (
+                        <MotionReveal
+                          key={item.id}
+                          className="min-w-0"
+                          delay={index * 0.08}
+                        >
+                          <CardPacket
+                            id={item.id}
+                            badgeType={item.badgeType}
+                            badgeText={item.badgeText ?? undefined}
+                            title={item.name}
+                            price={hasSalePrice ? item.salePrice! : item.price}
+                            oldPrice={hasSalePrice ? item.price : undefined}
+                            duration={item.duration ?? undefined}
+                            description={item.description}
+                            features={parseFeatures(item.features)}
+                          />
+                        </MotionReveal>
+                      );
+                    })}
                   </div>
                 </div>
               );

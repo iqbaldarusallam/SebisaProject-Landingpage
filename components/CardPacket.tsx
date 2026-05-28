@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
-import CheckoutModal from "./CheckoutModal";
 import { formatCurrency } from "@/lib/client-utils";
 
 type BadgeType = "none" | "popular" | "discount" | "custom";
@@ -34,12 +33,13 @@ function getBadgeLabel(
   oldPrice: number | undefined,
 ) {
   const type = (badgeType ?? "none") as BadgeType;
+  const hasDiscount = oldPrice && oldPrice > price;
 
   if (type === "popular") {
     return "POPULER";
   }
 
-  if (type === "discount" && oldPrice && oldPrice > price) {
+  if (type === "discount" && hasDiscount) {
     const percent = Math.round(((oldPrice - price) / oldPrice) * 100);
     return `Hemat ${percent}%`;
   }
@@ -62,8 +62,7 @@ export default function CardPacket({
   description,
   features,
 }: CardPacketProps) {
-  const [showCheckout, setShowCheckout] = useState(false);
-  const [claimedPromoCode, setClaimedPromoCode] = useState("");
+  const router = useRouter();
   const reduceMotion = useReducedMotion();
   const normalizedBadgeType = (badgeType ?? "none") as BadgeType;
   const isPopular = normalizedBadgeType === "popular";
@@ -78,13 +77,13 @@ export default function CardPacket({
     <>
       <motion.div
         whileHover={reduceMotion ? undefined : { y: -8, scale: 1.01 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className={`
           relative mt-4 flex h-97.5 min-h-0 flex-col
           rounded-2xl
           border-2 px-3 pb-4 pt-6
           text-white shadow-xl
-          transition-shadow duration-300
+          transition-shadow duration-[400ms]
           hover:shadow-cyan-500/20
           bg-linear-to-b
           from-[#102155]
@@ -124,13 +123,13 @@ export default function CardPacket({
             {description}
           </p>
 
-          {oldPrice && (
+          {oldPrice && oldPrice > price && (
             <p className="mt-3 text-center text-xs text-slate-400 line-through sm:text-sm">
               {formatCurrency(oldPrice)}
             </p>
           )}
 
-          {price && (
+          {price > 0 && (
             <h2 className="mt-1 text-center text-lg font-extrabold sm:text-3xl">
               {formatCurrency(price)}
             </h2>
@@ -158,16 +157,22 @@ export default function CardPacket({
 
           <motion.button
             onClick={() => {
-              setClaimedPromoCode(getClaimedPromoCode());
-              setShowCheckout(true);
+              const params = new URLSearchParams({ packageId: String(id) });
+              const promoCode = getClaimedPromoCode();
+
+              if (promoCode) {
+                params.set("promo", promoCode);
+              }
+
+              router.push(`/checkout?${params.toString()}`);
             }}
             whileHover={reduceMotion ? undefined : { scale: 1.03 }}
             whileTap={reduceMotion ? undefined : { scale: 0.97 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="
               mt-5 min-h-10 w-full rounded-full py-2.5
               text-xs font-bold text-white
-              transition-shadow duration-300
+              transition-shadow duration-[400ms]
               bg-linear-to-b
               from-[#39B2EC]
               to-[#206586]
@@ -177,17 +182,6 @@ export default function CardPacket({
           </motion.button>
         </div>
       </motion.div>
-
-      <CheckoutModal
-        isOpen={showCheckout}
-        onClose={() => setShowCheckout(false)}
-        packageId={id}
-        packageName={title}
-        basePrice={price}
-        strikePrice={oldPrice}
-        initialPromoCode={claimedPromoCode}
-        onSuccess={() => undefined}
-      />
     </>
   );
 }

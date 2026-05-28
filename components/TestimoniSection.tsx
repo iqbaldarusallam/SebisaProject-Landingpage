@@ -45,23 +45,35 @@ export default function TestimoniSection({
         </MotionReveal>
 
         {/* Cards */}
-        <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-6 lg:mt-16">
-          {testimonials.map((item, index) => (
-            <MotionReveal
-              key={item.id}
-              className="min-w-0"
-              delay={index * 0.08}
-            >
-              <CardTestimoni
-                quote={item.content}
-                name={item.name}
-                role={item.brand}
-                initials={getInitials(item.name)}
-                rating={item.rating}
-              />
-            </MotionReveal>
-          ))}
-        </div>
+        {testimonials.length > 0 && (
+          <MotionReveal delay={0.08} className="mt-10 lg:mt-16">
+            <div className="relative overflow-hidden py-2">
+              <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-12 bg-linear-to-r from-[#ECECEC] to-transparent sm:w-24" />
+              <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-12 bg-linear-to-l from-[#ECECEC] to-transparent sm:w-24" />
+
+              <div className="marquee flex w-max gap-4 hover:[animation-play-state:paused] sm:gap-6">
+                {[...Array(2)].map((_, loopIndex) => (
+                  <div key={loopIndex} className="flex gap-4 sm:gap-6">
+                    {testimonials.map((item) => (
+                      <div
+                        key={`${loopIndex}-${item.id}`}
+                        className="w-72 shrink-0 sm:w-80 md:w-96"
+                      >
+                        <CardTestimoni
+                          quote={item.content}
+                          name={item.name}
+                          role={item.brand}
+                          initials={getInitials(item.name)}
+                          rating={item.rating}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </MotionReveal>
+        )}
 
         {/* Contact Heading */}
         <MotionReveal

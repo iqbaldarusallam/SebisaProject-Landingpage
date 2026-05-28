@@ -15,6 +15,7 @@ export default async function PublicLayout({
     prisma.promo.findFirst({
       where: {
         isActive: true,
+        code: { not: { startsWith: "AUTO-" } },
         startDate: { lte: now },
         endDate: { gte: now },
       },

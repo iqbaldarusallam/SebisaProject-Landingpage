@@ -56,10 +56,10 @@ const Hero = ({ heroContent, trustedBrands }: HeroProps) => {
         {/* Logo */}
         <motion.div
           {...fadeUp}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
         >
           <Image
-            src="/logo-hero.png"
+            src="/logo-navbar.png"
             alt="Sebisa Project"
             width={350}
             height={100}
@@ -112,7 +112,7 @@ const Hero = ({ heroContent, trustedBrands }: HeroProps) => {
             bg-sky-700 px-7 py-3
             text-sm font-semibold text-white
             shadow-lg
-            transition-all duration-300
+            transition-all duration-400
             hover:bg-sky-800 sm:px-8
           "
         >
@@ -127,16 +127,16 @@ const Hero = ({ heroContent, trustedBrands }: HeroProps) => {
           whileInView={
             reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }
           }
-          viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          viewport={{ once: false, amount: 0.25 }}
+          transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
           className="rounded-[28px] bg-[#F4F4F4] p-4 shadow-2xl sm:p-6 lg:p-8"
         >
           {/* Stats Grid */}
           <div className="grid grid-cols-3 gap-2 sm:gap-5 md:gap-6">
             <motion.div
               whileHover={reduceMotion ? undefined : { y: -6 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-xl bg-white px-2 py-4 text-center shadow-md transition-shadow duration-300 hover:shadow-xl sm:rounded-2xl sm:p-6"
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className="rounded-xl bg-white px-2 py-4 text-center shadow-md transition-shadow duration-400 hover:shadow-xl sm:rounded-2xl sm:p-6"
             >
               <FaGlobe className="mx-auto mb-2 text-xl text-sky-700 sm:mb-4 sm:text-3xl" />
               <h3 className="text-xl font-extrabold text-sky-700 sm:text-3xl">
@@ -149,8 +149,8 @@ const Hero = ({ heroContent, trustedBrands }: HeroProps) => {
 
             <motion.div
               whileHover={reduceMotion ? undefined : { y: -6 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-xl bg-white px-2 py-4 text-center shadow-md transition-shadow duration-300 hover:shadow-xl sm:rounded-2xl sm:p-6"
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className="rounded-xl bg-white px-2 py-4 text-center shadow-md transition-shadow duration-400er:shadow-xl sm:rounded-2xl sm:p-6"
             >
               <FaBriefcase className="mx-auto mb-2 text-xl text-sky-700 sm:mb-4 sm:text-3xl" />
               <h3 className="text-xl font-extrabold text-sky-700 sm:text-3xl">
@@ -163,8 +163,8 @@ const Hero = ({ heroContent, trustedBrands }: HeroProps) => {
 
             <motion.div
               whileHover={reduceMotion ? undefined : { y: -6 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-xl bg-white px-2 py-4 text-center shadow-md transition-shadow duration-300 hover:shadow-xl sm:rounded-2xl sm:p-6"
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className="rounded-xl bg-white px-2 py-4 text-center shadow-md transition-shadow duration-400 hover:shadow-xl sm:rounded-2xl sm:p-6"
             >
               <FaSmile className="mx-auto mb-2 text-xl text-sky-700 sm:mb-4 sm:text-3xl" />
               <h3 className="text-xl font-extrabold text-sky-700 sm:text-3xl">
@@ -193,7 +193,7 @@ const Hero = ({ heroContent, trustedBrands }: HeroProps) => {
                       <div
                         key={`${loopIndex}-${item.id}`}
                         aria-label={item.brand}
-                        className="h-12 min-w-24 rounded-xl bg-white bg-contain bg-center bg-no-repeat px-4 shadow-sm transition-all duration-300 hover:shadow-md sm:h-16 sm:min-w-30 sm:px-5"
+                        className="h-12 min-w-24 rounded-xl bg-white bg-contain bg-center bg-no-repeat px-4 shadow-sm transition-all duration-400 hover:shadow-md sm:h-16 sm:min-w-30 sm:px-5"
                         style={{ backgroundImage: `url("${item.image}")` }}
                       />
                     ))}
@@ -211,8 +211,8 @@ const Hero = ({ heroContent, trustedBrands }: HeroProps) => {
           <motion.h2
             initial={reduceMotion ? false : { opacity: 0, y: 24 }}
             whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.35 }}
-            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+            viewport={{ once: false, amount: 0.35 }}
+            transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
             className="text-3xl font-bold leading-tight sm:text-4xl md:text-5xl"
           >
             {heroContent.heroBottomHeading}
@@ -228,7 +228,7 @@ const Hero = ({ heroContent, trustedBrands }: HeroProps) => {
             rel="noopener noreferrer"
             whileHover={reduceMotion ? undefined : { y: -3, scale: 1.03 }}
             whileTap={reduceMotion ? undefined : { scale: 0.97 }}
-            className="mt-8 inline-flex min-h-11 items-center justify-center rounded-full bg-sky-700 px-8 py-3 text-sm font-semibold text-white transition-colors duration-300 hover:bg-sky-800"
+            className="mt-8 inline-flex min-h-11 items-center justify-center rounded-full bg-sky-700 px-8 py-3 text-sm font-semibold text-white transition-colors duration-400 hover:bg-sky-800"
           >
             {heroContent.heroBottomButtonText}
           </motion.a>

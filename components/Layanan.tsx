@@ -31,6 +31,33 @@ const services = [
   },
 ];
 
+const whyStats = [
+  {
+    value: "100",
+    suffix: "+",
+    description: "Website berhasil dibangun dan diluncurkan",
+    featured: true,
+  },
+  {
+    value: "80",
+    suffix: "+",
+    description: "Klien puas dari berbagai industri",
+  },
+  {
+    value: "4.9/5",
+    description: "Rating rata-rata klien",
+  },
+  {
+    value: "91",
+    suffix: "%",
+    description: "Repeat order dari klien lama",
+  },
+  {
+    value: "24/7",
+    description: "Fast response & support",
+  },
+];
+
 const Layanan = () => {
   const reduceMotion = useReducedMotion();
 
@@ -40,8 +67,8 @@ const Layanan = () => {
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 22 }}
           whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.35 }}
-          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          viewport={{ once: false, amount: 0.35 }}
+          transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
           className="mb-10 flex justify-center"
         >
           <span className="rounded-full bg-sky-700 px-5 py-2 text-xs font-semibold text-white sm:px-6 sm:text-sm">
@@ -53,7 +80,7 @@ const Layanan = () => {
           {services.map((item, i) => (
             <ServiceCard
               key={item.title}
-              delay={i * 0.08}
+              delay={i * 0.12}
               description={item.desc}
               reduceMotion={Boolean(reduceMotion)}
               title={item.title}
@@ -65,8 +92,8 @@ const Layanan = () => {
           <motion.div
             initial={reduceMotion ? false : { opacity: 0, x: -28 }}
             whileInView={reduceMotion ? undefined : { opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+            viewport={{ once: false, amount: 0.25 }}
+            transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
           >
             <h2
               className="text-5xl font-extrabold leading-[0.9] tracking-wide text-sky-800 sm:text-6xl md:text-7xl lg:text-8xl"
@@ -82,7 +109,7 @@ const Layanan = () => {
                 rel="noopener noreferrer"
                 whileHover={reduceMotion ? undefined : { scale: 1.03 }}
                 whileTap={reduceMotion ? undefined : { scale: 0.97 }}
-                className="inline-flex min-h-10 items-center justify-center rounded-lg border border-sky-700 px-4 py-2 text-sky-700 transition hover:bg-sky-700 hover:text-white"
+                className="inline-flex min-h-10 items-center justify-center rounded-lg border border-sky-700 px-4 py-2 text-sky-700 transition duration-[400ms] hover:bg-sky-700 hover:text-white"
               >
                 Konsultasi Gratis
               </motion.a>
@@ -95,42 +122,13 @@ const Layanan = () => {
           <motion.div
             initial={reduceMotion ? false : { opacity: 0, x: 28 }}
             whileInView={reduceMotion ? undefined : { opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-            className="grid grid-cols-2 gap-3 sm:gap-4"
+            viewport={{ once: false, amount: 0.25 }}
+            transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
+            className="grid grid-cols-2 gap-2.5 sm:gap-3"
           >
-            <div className="col-span-2 rounded-xl bg-sky-800 p-5 text-center text-white sm:p-6">
-              <div className="text-2xl font-bold sm:text-3xl">100+</div>
-              <p className="mt-1 text-xs text-gray-200">
-                Website berhasil dibangun dan digunakan
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-slate-800 p-4 text-center text-white sm:p-5">
-              <div className="text-xl font-bold">80+</div>
-              <p className="mt-1 text-xs text-gray-300">
-                Client puas dengan layanan
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-slate-800 p-4 text-center text-white sm:p-5">
-              <div className="text-xl font-bold">4.9/5</div>
-              <p className="mt-1 text-xs text-gray-300">
-                Rating rata-rata client
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-slate-800 p-4 text-center text-white sm:p-5">
-              <div className="text-xl font-bold">91%</div>
-              <p className="mt-1 text-xs text-gray-300">
-                Project selesai tepat waktu
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-slate-800 p-4 text-center text-white sm:p-5">
-              <div className="text-xl font-bold">24/7</div>
-              <p className="mt-1 text-xs text-gray-300">Tim support standby</p>
-            </div>
+            {whyStats.map((stat) => (
+              <WhyStatCard key={stat.description} {...stat} />
+            ))}
           </motion.div>
         </div>
       </div>
@@ -139,6 +137,44 @@ const Layanan = () => {
 };
 
 export default Layanan;
+
+function WhyStatCard({
+  description,
+  featured = false,
+  suffix,
+  value,
+}: {
+  description: string;
+  featured?: boolean;
+  suffix?: string;
+  value: string;
+}) {
+  return (
+    <div
+      className={`flex min-h-20 flex-col items-center justify-center rounded-xl border border-cyan-300/80 text-center text-white shadow-[0_8px_18px_rgba(15,23,42,0.16)] ${
+        featured
+          ? "col-span-2 bg-[#244B78] px-5 py-5 sm:min-h-24"
+          : "bg-[#131C36] px-3 py-4 sm:min-h-24 sm:px-4"
+      }`}
+    >
+      <div
+        className={`font-extrabold leading-none ${
+          featured ? "text-3xl sm:text-4xl" : "text-2xl sm:text-3xl"
+        }`}
+      >
+        {value}
+        {suffix && <span className="text-cyan-300">{suffix}</span>}
+      </div>
+      <p
+        className={`mt-2 max-w-full text-[10px] leading-snug text-slate-300 sm:text-xs ${
+          featured ? "sm:max-w-sm" : ""
+        }`}
+      >
+        {description}
+      </p>
+    </div>
+  );
+}
 
 function ServiceCard({
   delay,
@@ -165,13 +201,13 @@ function ServiceCard({
       initial={reduceMotion ? false : { opacity: 0, y: 24 }}
       whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
       whileHover={reduceMotion ? undefined : { y: -5 }}
-      viewport={{ once: true, amount: 0.22 }}
+      viewport={{ once: false, amount: 0.22 }}
       transition={{
-        duration: 0.85,
+        duration: 0.95,
         delay,
         ease: [0.16, 1, 0.3, 1],
       }}
-      className="flex min-w-0 flex-col rounded-xl border border-sky-200 bg-[#E0F2FE] p-3 shadow-sm transition-shadow hover:shadow-md sm:rounded-2xl sm:p-6"
+      className="flex min-w-0 flex-col rounded-xl border border-sky-200 bg-[#E0F2FE] p-3 shadow-sm transition-shadow duration-[400ms] hover:shadow-md sm:rounded-2xl sm:p-6"
     >
       <h3 className="text-sm font-bold leading-tight text-gray-800 sm:text-lg">
         {title}

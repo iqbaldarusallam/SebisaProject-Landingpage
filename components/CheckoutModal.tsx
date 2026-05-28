@@ -9,7 +9,7 @@ interface CheckoutModalProps {
   packageId: number;
   packageName: string;
   basePrice: number;
-  strikePrice?: number;
+  normalPrice?: number;
   initialPromoCode?: string;
   onSuccess?: (orderId: string) => void;
 }
@@ -20,7 +20,7 @@ export default function CheckoutModal({
   packageId,
   packageName,
   basePrice,
-  strikePrice,
+  normalPrice,
   initialPromoCode,
   onSuccess,
 }: CheckoutModalProps) {
@@ -56,7 +56,7 @@ export default function CheckoutModal({
             packageId={packageId}
             packageName={packageName}
             basePrice={basePrice}
-            strikePrice={strikePrice}
+            normalPrice={normalPrice}
             initialPromoCode={initialPromoCode}
             onClose={onClose}
             onSuccess={(orderId) => {
