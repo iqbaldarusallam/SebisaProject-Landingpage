@@ -1,0 +1,1 @@
+ALTER TABLE "Package" DROP COLUMN IF EXISTS "order";
