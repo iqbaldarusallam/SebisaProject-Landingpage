@@ -1,5 +1,71 @@
 import { prisma } from "@/lib/db";
 
+const AUTOMATIC_DISCOUNT_CODE_PREFIX = "AUTO-";
+
+export type PromoWithPackages = {
+  id: number;
+  code: string;
+  discountType: string;
+  discountValue: number;
+  isActive: boolean;
+  startDate: Date | null;
+  endDate: Date | null;
+  maxUsage: number | null;
+  currentUsage: number;
+  packages: Array<{ packageId: number }>;
+};
+
+function isAutomaticDiscountCode(code: string) {
+  return code.toUpperCase().startsWith(AUTOMATIC_DISCOUNT_CODE_PREFIX);
+}
+
+function getPromoDiscount(basePrice: number, promo: PromoWithPackages) {
+  const rawDiscount =
+    promo.discountType === "percentage"
+      ? (basePrice * promo.discountValue) / 100
+      : promo.discountValue;
+
+  return Math.min(basePrice, Math.max(0, rawDiscount));
+}
+
+function promoAppliesToPackage(promo: PromoWithPackages, packageId: number) {
+  return (
+    promo.packages.length === 0 ||
+    promo.packages.some((item) => item.packageId === packageId)
+  );
+}
+
+function assertClaimablePromo(
+  promo: PromoWithPackages | null,
+  packageId: number,
+): asserts promo is PromoWithPackages {
+  if (!promo || isAutomaticDiscountCode(promo.code)) {
+    throw new Error("Kode promo tidak ditemukan");
+  }
+
+  if (!promo.isActive) {
+    throw new Error("Kode promo sedang tidak aktif");
+  }
+
+  const now = new Date();
+
+  if (promo.startDate && promo.startDate > now) {
+    throw new Error("Kode promo belum aktif");
+  }
+
+  if (promo.endDate && promo.endDate < now) {
+    throw new Error("Kode promo sudah berakhir");
+  }
+
+  if (!promoAppliesToPackage(promo, packageId)) {
+    throw new Error("Kode promo tidak berlaku untuk paket ini");
+  }
+
+  if (promo.maxUsage && promo.currentUsage >= promo.maxUsage) {
+    throw new Error("Kuota kode promo sudah habis");
+  }
+}
+
 export async function calculateOrderTotal(
   packageId: number,
   promoCode?: string,
@@ -19,38 +85,19 @@ export async function calculateOrderTotal(
 
   let discount = 0;
   let promoId: number | undefined;
-  const basePrice = pkg.price;
+  const basePrice =
+    pkg.salePrice && pkg.salePrice < pkg.price ? pkg.salePrice : pkg.price;
+  const normalizedPromoCode = promoCode?.trim().toUpperCase();
 
-  if (promoCode) {
+  if (normalizedPromoCode) {
     const promo = await prisma.promo.findUnique({
-      where: { code: promoCode },
+      where: { code: normalizedPromoCode },
       include: { packages: true },
     });
 
-    if (promo && promo.isActive) {
-      const now = new Date();
-      if (
-        promo.startDate &&
-        promo.endDate &&
-        promo.startDate <= now &&
-        now <= promo.endDate
-      ) {
-        const isApplicable = promo.packages.some(
-          (p: { packageId: number }) => p.packageId === packageId,
-        );
-        if (
-          isApplicable &&
-          (!promo.maxUsage || promo.currentUsage < promo.maxUsage)
-        ) {
-          promoId = promo.id;
-          if (promo.discountType === "percentage") {
-            discount = (basePrice * promo.discountValue) / 100;
-          } else {
-            discount = promo.discountValue;
-          }
-        }
-      }
-    }
+    assertClaimablePromo(promo, packageId);
+    promoId = promo.id;
+    discount = getPromoDiscount(basePrice, promo);
   }
 
   return {

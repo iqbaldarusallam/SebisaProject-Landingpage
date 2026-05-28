@@ -8,11 +8,11 @@ const optionalTextInput = z.preprocess(
 export const packageSchema = z.object({
   name: z.string().min(1, "Package name required"),
   category: z
-    .enum(["social-media-management", "graphic-design"])
+    .enum(["social-media-management", "graphic-design", "website-development"])
     .default("social-media-management"),
   description: z.string().min(1, "Description required"),
-  price: z.coerce.number().positive("Price must be positive"),
-  strikePrice: z.preprocess(
+  price: z.coerce.number().positive("Harga normal wajib lebih dari 0"),
+  salePrice: z.preprocess(
     (val) => (val === "" ? null : val),
     z.coerce.number().positive().nullable().optional(),
   ),
@@ -40,7 +40,7 @@ export const packageSchema = z.object({
 export const promoSchema = z.object({
   name: z.string().min(1, "Promo name required"),
   description: z.string().min(1, "Description required"),
-  code: z.string().min(1, "Promo code required").toUpperCase(),
+  code: z.string().trim().min(1, "Promo code required").toUpperCase(),
   discountType: z.enum(["percentage", "fixed"]).default("percentage"),
   discountValue: z.coerce.number().positive("Discount must be positive"),
   isActive: z.boolean().default(true),
@@ -141,5 +141,9 @@ export const orderSchema = z.object({
     .min(10, "Phone at least 10 digits")
     .regex(/^\d+$/, "Phone must contain only digits"),
   packageId: z.coerce.number().positive("Package required"),
-  promoCode: z.string().optional().or(z.literal("")),
+  promoCode: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .transform((value) => value?.trim().toUpperCase() ?? ""),
 });
