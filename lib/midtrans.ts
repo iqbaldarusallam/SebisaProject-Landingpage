@@ -1,10 +1,17 @@
-import midtransClient from "midtrans-client";
+import { Snap } from "midtrans-client";
 import { createHash } from "crypto";
 
-const snap = new midtransClient.Snap({
+type SnapWithTransaction = Snap & {
+  transaction: {
+    status(orderId: string): Promise<unknown>;
+  };
+};
+
+const snap = new Snap({
   isProduction: process.env.MIDTRANS_IS_PRODUCTION === "true",
   serverKey: process.env.MIDTRANS_SERVER_KEY!,
-});
+  clientKey: process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY ?? "",
+}) as SnapWithTransaction;
 
 export interface MidtransTransaction {
   transaction_details: {
@@ -35,8 +42,8 @@ export async function createMidtransTransaction(
       throw new Error("MIDTRANS_SERVER_KEY is not configured");
     }
 
-    const token = await snap.createTransactionToken(transaction);
-    return token;
+    const response = await snap.createTransaction(transaction);
+    return response.token;
   } catch (error) {
     console.error("Midtrans error:", error);
     throw error;

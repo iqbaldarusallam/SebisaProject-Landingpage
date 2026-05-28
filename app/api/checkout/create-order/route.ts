@@ -4,6 +4,8 @@ import { orderSchema } from "@/lib/validations";
 import { calculateOrderTotal, generateOrderId } from "@/lib/utils";
 import { createMidtransTransaction } from "@/lib/midtrans";
 
+export const runtime = "nodejs";
+
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const parsed = orderSchema.safeParse(body);
