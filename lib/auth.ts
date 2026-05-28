@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { adminLoginSchema } from "@/lib/validations";
 
 export const authOptions: NextAuthOptions = {
+  useSecureCookies: process.env.NODE_ENV === "production",
   providers: [
     CredentialsProvider({
       credentials: {
@@ -20,7 +21,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         const admin = await prisma.admin.findUnique({
-          where: { email: parsed.data.email },
+          where: { email: parsed.data.email.trim().toLowerCase() },
         });
 
         if (!admin) {

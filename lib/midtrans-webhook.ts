@@ -25,10 +25,13 @@ function getOrderStatus(notification: MidtransNotification) {
   if (
     transactionStatus === "deny" ||
     transactionStatus === "cancel" ||
-    transactionStatus === "expire" ||
     transactionStatus === "failure"
   ) {
     return "failed";
+  }
+
+  if (transactionStatus === "expire") {
+    return "expired";
   }
 
   if (transactionStatus === "refund" || transactionStatus === "partial_refund") {

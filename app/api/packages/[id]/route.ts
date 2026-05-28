@@ -76,12 +76,38 @@ export async function DELETE(
       return Response.json(errorResponse("Invalid package id"), { status: 400 });
     }
 
-    const pkg = await prisma.package.delete({
+    const existingPackage = await prisma.package.findUnique({
       where: { id },
+    });
+
+    if (!existingPackage) {
+      return Response.json(errorResponse("Package not found"), {
+        status: 404,
+      });
+    }
+
+    const pkg = await prisma.$transaction(async (tx) => {
+      await tx.order.updateMany({
+        where: { packageId: id },
+        data: { packageId: null },
+      });
+
+      await tx.promoPackage.deleteMany({
+        where: { packageId: id },
+      });
+
+      await tx.orderItem.deleteMany({
+        where: { packageId: id },
+      });
+
+      return tx.package.delete({
+        where: { id },
+      });
     });
 
     return Response.json(successResponse(pkg, "Package deleted"));
   } catch (error) {
+    console.error("Error deleting package:", error);
     return Response.json(
       errorResponse(error instanceof Error ? error.message : "Error deleting package"),
       { status: 500 }

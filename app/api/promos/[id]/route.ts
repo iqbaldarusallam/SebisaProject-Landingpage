@@ -94,12 +94,32 @@ export async function DELETE(
       return Response.json(errorResponse("Invalid promo id"), { status: 400 });
     }
 
-    const promo = await prisma.promo.delete({
+    const existingPromo = await prisma.promo.findUnique({
       where: { id },
+    });
+
+    if (!existingPromo) {
+      return Response.json(errorResponse("Promo not found"), { status: 404 });
+    }
+
+    const promo = await prisma.$transaction(async (tx) => {
+      await tx.order.updateMany({
+        where: { promoId: id },
+        data: { promoId: null },
+      });
+
+      await tx.promoPackage.deleteMany({
+        where: { promoId: id },
+      });
+
+      return tx.promo.delete({
+        where: { id },
+      });
     });
 
     return Response.json(successResponse(promo, "Promo deleted"));
   } catch (error) {
+    console.error("Error deleting promo:", error);
     return Response.json(
       errorResponse(
         error instanceof Error ? error.message : "Error deleting promo",
