@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { formatCurrency } from "@/lib/client-utils";
 
 type BadgeType = "none" | "popular" | "discount" | "custom";
@@ -64,7 +64,6 @@ export default function CardPacket({
   features,
 }: CardPacketProps) {
   const router = useRouter();
-  const reduceMotion = useReducedMotion();
   const [isPending, startTransition] = useTransition();
   const normalizedBadgeType = (badgeType ?? "none") as BadgeType;
   const isPopular = normalizedBadgeType === "popular";
@@ -78,15 +77,13 @@ export default function CardPacket({
   return (
     <>
       <motion.div
-        whileHover={reduceMotion ? undefined : { y: -8, scale: 1.01 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className={`
           relative mt-4 flex h-97.5 min-h-0 flex-col
           rounded-2xl
           border-2 px-3 pb-4 pt-6
           text-white shadow-xl
-          transition-shadow duration-[400ms]
-          hover:shadow-cyan-500/20
+          transition-[border-color,box-shadow,filter] duration-300
+          hover:shadow-cyan-500/20 hover:brightness-105
           bg-linear-to-b
           from-[#102155]
           via-[#173472]

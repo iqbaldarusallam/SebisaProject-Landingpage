@@ -70,7 +70,9 @@ export default async function PacketSection() {
                         <MotionReveal
                           key={item.id}
                           className="min-w-0"
-                          delay={index * 0.08}
+                          delay={index * 0.06}
+                          y={16}
+                          once
                         >
                           <CardPacket
                             id={item.id}
