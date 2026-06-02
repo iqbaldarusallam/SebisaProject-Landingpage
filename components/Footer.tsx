@@ -40,6 +40,10 @@ const Footer = () => {
               <li className="hover:text-white cursor-pointer">Landing Page</li>
               <li className="hover:text-white cursor-pointer">Media Sosial</li>
               <li className="hover:text-white cursor-pointer">Iklan Digital</li>
+              <li className="hover:text-white cursor-pointer">Liputan Berita</li>
+              <li className="hover:text-white cursor-pointer">Branding Produk</li>
+              <li className="hover:text-white cursor-pointer">Media YouTube</li>
+              <li className="hover:text-white cursor-pointer">Company Profile</li>
             </ul>
           </div>
 

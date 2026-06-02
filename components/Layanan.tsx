@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { WHATSAPP_CONSULTATION_URL } from "@/lib/whatsapp";
 
 const services = [
@@ -26,6 +26,26 @@ const services = [
     desc: "Pembuatan konten visual dan video profesional yang mampu meningkatkan daya tarik brand serta memperkuat komunikasi bisnis kepada pelanggan. Layanan mencakup produksi foto produk, video promosi, video cinematic, reels media sosial, hingga editing profesional dengan konsep kreatif yang disesuaikan dengan identitas dan kebutuhan branding perusahaan agar lebih menarik dan kompetitif di era digital.",
   },
   {
+    title: "Pengelolaan Media Isu & Kasus Berita",
+    desc: "Layanan pengelolaan media untuk isu, kasus, atau pemberitaan tertentu dengan output berupa press release dan video pendek aktual. Materi dikembangkan dari liputan kasus, rangkuman isu, serta headline yang diangkat dari statement ahli agar pesan utama tersampaikan secara jelas, terarah, dan relevan untuk kebutuhan publikasi.",
+  },
+  {
+    title: "Liputan Persidangan & Konferensi Pers",
+    desc: "Layanan liputan berita untuk persidangan, konferensi pers, dan agenda resmi lainnya dengan dokumentasi aktual. Output dapat berupa live streaming, video pendek, rangkuman berita, serta materi publikasi yang disusun cepat dan rapi untuk kebutuhan media, brand, organisasi, maupun perusahaan.",
+  },
+  {
+    title: "Desain Grafis, Logo & Mockup Branding",
+    desc: "Pembuatan desain grafis untuk kebutuhan identitas brand, logo, mockup produk, dan materi visual bisnis. Layanan ini membantu brand memiliki tampilan yang lebih profesional, konsisten, dan mudah dikenali melalui konsep visual yang disesuaikan dengan karakter produk atau perusahaan.",
+  },
+  {
+    title: "Pengelolaan Media YouTube",
+    desc: "Layanan pengelolaan media YouTube mulai dari perencanaan konten, produksi atau editing video, optimasi judul dan deskripsi, thumbnail, penjadwalan upload, hingga evaluasi performa channel. Tujuannya membantu brand membangun kanal video yang lebih rapi, aktif, dan relevan dengan audiens.",
+  },
+  {
+    title: "Pembuatan Company Profile Perusahaan",
+    desc: "Pembuatan company profile perusahaan dalam bentuk narasi, desain visual, dan materi presentasi yang profesional. Company profile disusun untuk memperkenalkan identitas, layanan, keunggulan, portofolio, dan kredibilitas perusahaan agar lebih siap digunakan untuk kebutuhan proposal, kerja sama, maupun presentasi bisnis.",
+  },
+  {
     title: "Marketplace & Toko Online",
     desc: "Pengembangan dan pengelolaan marketplace maupun toko online untuk membantu bisnis meningkatkan penjualan secara digital melalui platform e-commerce. Layanan meliputi setup toko online, optimasi tampilan produk, pengelolaan katalog, integrasi pembayaran, strategi promosi marketplace, serta pendampingan pengelolaan toko agar bisnis lebih mudah menjangkau pelanggan dan meningkatkan performa penjualan online.",
   },
@@ -33,27 +53,30 @@ const services = [
 
 const whyStats = [
   {
-    value: "100",
+    value: 100,
     suffix: "+",
     description: "Website berhasil dibangun dan diluncurkan",
     featured: true,
   },
   {
-    value: "80",
+    value: 80,
     suffix: "+",
     description: "Klien puas dari berbagai industri",
   },
   {
-    value: "4.9/5",
+    value: 4.9,
+    suffix: "/5",
+    decimals: 1,
     description: "Rating rata-rata klien",
   },
   {
-    value: "91",
+    value: 91,
     suffix: "%",
     description: "Repeat order dari klien lama",
   },
   {
-    value: "24/7",
+    value: 24,
+    suffix: "/7",
     description: "Fast response & support",
   },
 ];
@@ -139,16 +162,20 @@ const Layanan = () => {
 export default Layanan;
 
 function WhyStatCard({
+  decimals = 0,
   description,
   featured = false,
   suffix,
   value,
 }: {
+  decimals?: number;
   description: string;
   featured?: boolean;
   suffix?: string;
-  value: string;
+  value: number;
 }) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <div
       className={`flex min-h-20 flex-col items-center justify-center rounded-xl border border-cyan-300/80 text-center text-white shadow-[0_8px_18px_rgba(15,23,42,0.16)] ${
@@ -162,8 +189,12 @@ function WhyStatCard({
           featured ? "text-3xl sm:text-4xl" : "text-2xl sm:text-3xl"
         }`}
       >
-        {value}
-        {suffix && <span className="text-cyan-300">{suffix}</span>}
+        <CountUpValue
+          decimals={decimals}
+          disabled={Boolean(reduceMotion)}
+          suffix={suffix}
+          value={value}
+        />
       </div>
       <p
         className={`mt-2 max-w-full text-[10px] leading-snug text-slate-300 sm:text-xs ${
@@ -173,6 +204,65 @@ function WhyStatCard({
         {description}
       </p>
     </div>
+  );
+}
+
+function CountUpValue({
+  decimals,
+  disabled,
+  suffix,
+  value,
+}: {
+  decimals: number;
+  disabled: boolean;
+  suffix?: string;
+  value: number;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { amount: 0.7 });
+  const [displayValue, setDisplayValue] = useState(disabled ? value : 0);
+
+  useEffect(() => {
+    if (disabled) {
+      setDisplayValue(value);
+      return;
+    }
+
+    if (!isInView) {
+      setDisplayValue(0);
+      return;
+    }
+
+    let frameId = 0;
+    const duration = 1400;
+    const startedAt = performance.now();
+
+    const animate = (currentTime: number) => {
+      const progress = Math.min((currentTime - startedAt) / duration, 1);
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+
+      setDisplayValue(value * easedProgress);
+
+      if (progress < 1) {
+        frameId = requestAnimationFrame(animate);
+      }
+    };
+
+    frameId = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(frameId);
+  }, [disabled, isInView, value]);
+
+  const formattedValue = displayValue.toLocaleString("id-ID", {
+    maximumFractionDigits: decimals,
+    minimumFractionDigits: decimals,
+  });
+
+  return (
+    <span ref={ref}>
+      {formattedValue}
+      {suffix && <span className="text-cyan-300">{suffix}</span>}
+    </span>
   );
 }
 
