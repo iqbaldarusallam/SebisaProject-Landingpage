@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import Logo from "./Logo";
 import MotionReveal from "./MotionReveal";
 import { WHATSAPP_CONSULTATION_URL } from "@/lib/whatsapp";
@@ -90,9 +91,12 @@ const Footer = () => {
           </p>
 
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-            <button className="rounded-xl border border-white px-5 py-2 text-sm hover:bg-white hover:text-[#131C36] transition">
+            <Link
+              href="/#layanan"
+              className="rounded-xl border border-white px-5 py-2 text-center text-sm transition hover:bg-white hover:text-[#131C36]"
+            >
               Lihat Semua Layanan
-            </button>
+            </Link>
 
             <a
               href={WHATSAPP_CONSULTATION_URL}

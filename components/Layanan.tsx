@@ -85,7 +85,7 @@ const Layanan = () => {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section className="bg-gray-100 px-5 py-16 sm:px-6 sm:py-20">
+    <section id="layanan" className="bg-gray-100 px-5 py-16 sm:px-6 sm:py-20">
       <div className="mx-auto max-w-6xl">
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 22 }}
