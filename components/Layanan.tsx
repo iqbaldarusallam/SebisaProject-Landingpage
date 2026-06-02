@@ -132,7 +132,7 @@ const Layanan = () => {
                 rel="noopener noreferrer"
                 whileHover={reduceMotion ? undefined : { scale: 1.03 }}
                 whileTap={reduceMotion ? undefined : { scale: 0.97 }}
-                className="inline-flex min-h-10 items-center justify-center rounded-lg border border-sky-700 px-4 py-2 text-sky-700 transition duration-[400ms] hover:bg-sky-700 hover:text-white"
+                className="inline-flex min-h-10 items-center justify-center rounded-lg border border-sky-700 px-4 py-2 text-sky-700 transition duration-400 hover:bg-sky-700 hover:text-white"
               >
                 Konsultasi Gratis
               </motion.a>
@@ -297,7 +297,7 @@ function ServiceCard({
         delay,
         ease: [0.16, 1, 0.3, 1],
       }}
-      className="flex min-w-0 flex-col rounded-xl border border-sky-200 bg-[#E0F2FE] p-3 shadow-sm transition-shadow duration-[400ms] hover:shadow-md sm:rounded-2xl sm:p-6"
+      className="flex min-w-0 flex-col rounded-xl border border-sky-200 bg-[#E0F2FE] p-3 shadow-sm transition-shadow duration-400 hover:shadow-md sm:rounded-2xl sm:p-6"
     >
       <h3 className="text-sm font-bold leading-tight text-gray-800 sm:text-lg">
         {title}
@@ -308,7 +308,9 @@ function ServiceCard({
         }`}
       >
         <span className="sm:hidden">{getPreview(mobilePreviewLimit)}</span>
-        <span className="hidden sm:inline">{getPreview(desktopPreviewLimit)}</span>
+        <span className="hidden sm:inline">
+          {getPreview(desktopPreviewLimit)}
+        </span>
       </p>
       {shouldTruncate && (
         <button
