@@ -158,15 +158,17 @@ export default function TestimonialFormPage() {
           value={formData.brand ?? ""}
           onChange={(e) => handleChange("brand", e.target.value)}
           error={errors.brand}
-          placeholder="Founder Kopi Ruang Kota"
+          placeholder="Owner Brand / Instansi"
           required
         />
 
         <TextInput
-          label="Rating (1-5)"
+          label="Rating (1-5, bisa desimal)"
           type="number"
           min="1"
           max="5"
+          step="0.1"
+          inputMode="decimal"
           value={formData.rating ?? 5}
           onChange={(e) => handleChange("rating", Number(e.target.value))}
           error={errors.rating}
@@ -178,12 +180,12 @@ export default function TestimonialFormPage() {
           value={formData.content ?? ""}
           onChange={(e) => handleChange("content", e.target.value)}
           error={errors.content}
-          maxLength={100}
+          maxLength={200}
           rows={5}
           required
         />
         <p className="-mt-4 text-xs text-slate-500">
-          {(formData.content ?? "").length}/100 karakter
+          {(formData.content ?? "").length}/200 karakter
         </p>
 
         <div className="flex gap-4">

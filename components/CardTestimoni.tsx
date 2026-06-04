@@ -19,7 +19,10 @@ export default function CardTestimoni({
   rating,
 }: CardTestimoniProps) {
   const reduceMotion = useReducedMotion();
-  const normalizedRating = Math.min(5, Math.max(1, Math.round(rating)));
+  const normalizedRating = Math.min(5, Math.max(0, rating));
+  const formattedRating = normalizedRating.toLocaleString("id-ID", {
+    maximumFractionDigits: 1,
+  });
 
   return (
     <motion.div
@@ -28,15 +31,34 @@ export default function CardTestimoni({
       className="flex h-52.5 flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-lg transition-shadow duration-[400ms] hover:shadow-xl sm:h-75 sm:rounded-[22px] sm:p-6 md:h-67.5"
     >
       {/* Stars */}
-      <div className="mb-3 flex gap-1 sm:mb-4">
-        {[...Array(5)].map((_, index) => (
-          <FaStar
-            key={index}
-            className={
-              index < normalizedRating ? "text-yellow-400" : "text-gray-200"
-            }
-          />
-        ))}
+      <div className="mb-3 flex items-center gap-2 sm:mb-4">
+        <div
+          className="flex gap-1"
+          aria-label={`Rating ${formattedRating} dari 5`}
+        >
+          {[...Array(5)].map((_, index) => (
+            <span
+              key={index}
+              className="relative inline-flex h-4 w-4 shrink-0 text-gray-200 sm:h-5 sm:w-5"
+            >
+              <FaStar aria-hidden className="h-full w-full" />
+              <span
+                className="absolute left-0 top-0 h-full overflow-hidden text-yellow-400"
+                style={{
+                  width: `${Math.min(
+                    100,
+                    Math.max(0, (normalizedRating - index) * 100),
+                  )}%`,
+                }}
+              >
+                <FaStar aria-hidden className="h-4 w-4 sm:h-5 sm:w-5" />
+              </span>
+            </span>
+          ))}
+        </div>
+        <span className="text-xs font-bold text-slate-500">
+          {formattedRating}/5
+        </span>
       </div>
 
       {/* Quote */}

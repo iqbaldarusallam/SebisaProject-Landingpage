@@ -17,18 +17,6 @@ const Footer = () => {
                 Mitra digital terpercaya untuk UMKM, personal brand, dan
                 perusahaan yang ingin tampil lebih profesional.
               </p>
-
-              {/* Input Email */}
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <input
-                  type="email"
-                  placeholder="Email Anda..."
-                  className="w-full rounded-xl border border-gray-500 bg-transparent px-4 py-3 text-sm text-white placeholder-gray-400 outline-none"
-                />
-                <button className="rounded-xl bg-blue-500 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-600">
-                  Daftar
-                </button>
-              </div>
             </div>
 
             {/* LAYANAN */}
@@ -79,7 +67,11 @@ const Footer = () => {
             <div>
               <h3 className="mb-4 text-lg font-semibold">Dukungan</h3>
               <ul className="space-y-3 text-gray-300">
-                <li className="hover:text-white cursor-pointer">FAQ</li>
+                <li>
+                  <Link href="/faq" className="hover:text-white">
+                    FAQ
+                  </Link>
+                </li>
                 <li className="hover:text-white cursor-pointer">Help Center</li>
                 <li className="hover:text-white cursor-pointer">Privasi</li>
                 <li>

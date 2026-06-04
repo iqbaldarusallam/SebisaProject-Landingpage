@@ -63,8 +63,8 @@ export const testimonialSchema = z.object({
   content: z
     .string()
     .min(1, "Content required")
-    .max(160, "Testimoni maksimal 160 karakter"),
-  rating: z.coerce.number().int().min(1).max(5).default(5),
+    .max(200, "Testimoni maksimal 200 karakter"),
+  rating: z.coerce.number().min(1).max(5).default(5),
 });
 
 export const trustedBrandSchema = z.object({

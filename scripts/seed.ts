@@ -288,24 +288,73 @@ async function main() {
       await prisma.testimonial.createMany({
         data: [
           {
-            name: "Kopi Ruang Kota",
-            brand: "Food & Beverage",
+            name: "Pak Ainur & Pak Taufik",
+            brand: "Tour Travel Umroh Al Hasan",
             content:
-              "Landing page baru bikin leads masuk lebih rapi, dan tim kami bisa pantau order tanpa spreadsheet manual.",
+              "Website sesuai harapan, leads bisa masuk 5 jamaah dalam sebulan. Pengelolaan TikTok dan Instagram juga konsisten membangun awareness.",
             rating: 5,
           },
           {
-            name: "Nusa Kreatif",
-            brand: "Creative Studio",
+            name: "Pak Saimin",
+            brand: "Yu! Kebab",
             content:
-              "Copywriting dan flow checkout-nya simpel. Cocok untuk traffic iklan yang butuh keputusan cepat.",
+              "Foto produk sangat terpakai untuk menu dan media sosial di 4 outlet. Desain outletnya juga membuat kami puas.",
+            rating: 4.5,
+          },
+          {
+            name: "Pak Hartono",
+            brand: "Rice Bran",
+            content:
+              "Company profile yang dibuat membuat produk kami lebih siap dikenalkan ke instansi lain dan punya pondasi informasi yang jelas.",
             rating: 5,
           },
           {
-            name: "Aruna Skincare",
-            brand: "Beauty",
+            name: "Pak Lanin",
+            brand: "Nasi Liwet Lavanda",
             content:
-              "Promo countdown dan harga coret membantu banget saat campaign launching produk baru.",
+              "Video company profile-nya keren dan membantu kami tampil lebih percaya diri sampai juara di kompetisi Bali.",
+            rating: 5,
+          },
+          {
+            name: "Pak Megel",
+            brand: "PT Wana Kencana Mineral",
+            content:
+              "Video release yang dibuat membantu penyampaian isu kami lebih jelas, terarah, dan mendapat perhatian yang sesuai.",
+            rating: 5,
+          },
+          {
+            name: "Ibu Aisyah",
+            brand: "Kebab Endul Frozen",
+            content:
+              "Live streaming jadi lebih terarah, lebih ramai ditonton, dan optimasi Shopee membantu produk lebih terbaca algoritma.",
+            rating: 4,
+          },
+          {
+            name: "Hj. Linda Maftuhah",
+            brand: "Pondok Pesantren An-Najah",
+            content:
+              "Media sosial dan website sekolah membantu aktivitas santri dan siswa lebih terekspos secara digital.",
+            rating: 5,
+          },
+          {
+            name: "Pak Mansur",
+            brand: "Kapsul Herbalamb",
+            content:
+              "Pengelolaan media jadi lebih rapi, dan testimoni produk membantu calon pembeli semakin yakin.",
+            rating: 5,
+          },
+          {
+            name: "Kak Kiki Chandra",
+            brand: "Jakarta Garden City",
+            content:
+              "Konten vlog yang dibuat terasa relatable, sesuai target pasar, dan berhasil membantu kami meraih beberapa juara.",
+            rating: 5,
+          },
+          {
+            name: "Pak Basuni",
+            brand: "PT Bina Auto Solusi",
+            content:
+              "Arahan creative video dan strategi marketing sangat membantu penjualan online meningkat sampai omzet bulanan melonjak.",
             rating: 5,
           },
         ],

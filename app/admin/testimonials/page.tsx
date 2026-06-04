@@ -80,7 +80,7 @@ export default function TestimonialsPage() {
     {
       key: "rating" as const,
       label: "Rating",
-      render: (value) => `Rating ${value}/5`,
+      render: (value) => `Rating ${Number(value).toLocaleString("id-ID")}/5`,
     },
     {
       key: "content" as const,
