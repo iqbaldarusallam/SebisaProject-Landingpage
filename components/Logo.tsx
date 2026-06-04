@@ -3,16 +3,17 @@ import React from "react";
 
 interface LogoProps {
   className?: string;
+  priority?: boolean;
 }
 
-const Logo = ({ className }: LogoProps) => {
+const Logo = ({ className, priority = false }: LogoProps) => {
   return (
     <Image
       src="/logo-sebisa.png"
       alt="Sebisa Project"
       width={120}
       height={40}
-      priority
+      priority={priority}
       className={`object-contain ${className}`}
     />
   );

@@ -23,3 +23,17 @@ body {
 .marquee {
   animation: marquee 35s linear infinite;
 }
+
+.brand-marquee {
+  animation: marquee 46s linear infinite;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee,
+  .brand-marquee {
+    animation: none;
+    transform: none;
+  }
+}

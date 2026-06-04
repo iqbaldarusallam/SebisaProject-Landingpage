@@ -26,8 +26,23 @@ interface HeroProps {
   trustedBrands: HeroBrand[];
 }
 
+const TRUSTED_BRAND_LIMIT = 12;
+
+function getOptimizedCloudinaryLogo(src: string) {
+  if (!src.includes("res.cloudinary.com") || !src.includes("/upload/")) {
+    return src;
+  }
+
+  if (src.includes("/upload/f_auto") || src.includes("/upload/q_auto")) {
+    return src;
+  }
+
+  return src.replace("/upload/", "/upload/f_auto,q_auto,w_240,c_fit/");
+}
+
 const Hero = ({ heroContent, trustedBrands }: HeroProps) => {
   const reduceMotion = useReducedMotion();
+  const visibleTrustedBrands = trustedBrands.slice(0, TRUSTED_BRAND_LIMIT);
   const fadeUp = reduceMotion
     ? {}
     : {
@@ -181,21 +196,28 @@ const Hero = ({ heroContent, trustedBrands }: HeroProps) => {
             {heroContent.heroClientsText}
           </p>
 
-          {trustedBrands.length > 0 && (
+          {visibleTrustedBrands.length > 0 && (
             <div className="relative mt-6 overflow-hidden">
               <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-16 bg-linear-to-r from-[#F4F4F4] to-transparent" />
               <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-16 bg-linear-to-l from-[#F4F4F4] to-transparent" />
 
-              <div className="marquee flex w-max gap-6 hover:[animation-play-state:paused]">
+              <div className="brand-marquee flex w-max gap-6 hover:[animation-play-state:paused]">
                 {[...Array(2)].map((_, loopIndex) => (
                   <div key={loopIndex} className="flex gap-4 sm:gap-6">
-                    {trustedBrands.map((item) => (
+                    {visibleTrustedBrands.map((item) => (
                       <div
                         key={`${loopIndex}-${item.id}`}
-                        aria-label={item.brand}
-                        className="h-12 min-w-24 rounded-xl bg-white bg-contain bg-center bg-no-repeat px-4 shadow-sm transition-all duration-400 hover:shadow-md sm:h-16 sm:min-w-30 sm:px-5"
-                        style={{ backgroundImage: `url("${item.image}")` }}
-                      />
+                        className="relative h-12 w-24 shrink-0 overflow-hidden rounded-lg bg-white px-3 ring-1 ring-slate-200/70 sm:h-16 sm:w-30 sm:px-4"
+                      >
+                        <Image
+                          src={getOptimizedCloudinaryLogo(item.image)}
+                          alt={item.brand}
+                          fill
+                          loading="lazy"
+                          sizes="(max-width: 640px) 96px, 120px"
+                          className="object-contain p-2 sm:p-3"
+                        />
+                      </div>
                     ))}
                   </div>
                 ))}

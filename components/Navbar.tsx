@@ -24,7 +24,7 @@ const Navbar = ({ promo, promoText }: NavbarProps) => {
   return (
     <div className="fixed top-0 z-50 w-full bg-[#131C36] shadow-sm">
       <div className="mx-auto flex h-14 max-w-screen-2xl items-center justify-between gap-2 px-3 sm:h-16 sm:gap-3 sm:px-8 lg:px-14">
-        <Logo className="w-20 shrink-0 sm:w-28 lg:w-32" />
+        <Logo className="w-20 shrink-0 sm:w-28 lg:w-32" priority />
 
         {trimmedPromoText && (
           <h1 className="min-w-0 flex-1 truncate text-center text-[8px] font-semibold uppercase leading-none text-white sm:text-xs md:text-sm lg:text-lg">
