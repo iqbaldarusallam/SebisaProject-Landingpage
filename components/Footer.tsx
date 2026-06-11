@@ -53,20 +53,35 @@ const Footer = () => {
               </ul>
             </div>
 
-            {/* PERUSAHAAN */}
+            {/* QUICK LINK */}
             <div>
-              <h3 className="mb-4 text-lg font-semibold">Perusahaan</h3>
+              <h3 className="mb-4 text-lg font-semibold">Quick Link</h3>
               <ul className="space-y-3 text-gray-300">
-                <li className="hover:text-white cursor-pointer">
-                  Tentang Kami
+                <li>
+                  <Link href="/" className="hover:text-white">
+                    Beranda
+                  </Link>
                 </li>
-                <li className="hover:text-white cursor-pointer">Tim Kami</li>
+                <li>
+                  <Link href="/#layanan" className="hover:text-white">
+                    Layanan
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/#paket" className="hover:text-white">
+                    Paket
+                  </Link>
+                </li>
                 <li>
                   <Link href="/#portofolio" className="hover:text-white">
                     Portofolio
                   </Link>
                 </li>
-                <li className="hover:text-white cursor-pointer">Blog</li>
+                <li>
+                  <Link href="/#kontak" className="hover:text-white">
+                    Kontak
+                  </Link>
+                </li>
               </ul>
             </div>
 
@@ -79,8 +94,6 @@ const Footer = () => {
                     FAQ
                   </Link>
                 </li>
-                <li className="hover:text-white cursor-pointer">Help Center</li>
-                <li className="hover:text-white cursor-pointer">Privasi</li>
                 <li>
                   <a
                     href={WHATSAPP_CONSULTATION_URL}
@@ -88,7 +101,7 @@ const Footer = () => {
                     rel="noopener noreferrer"
                     className="hover:text-white"
                   >
-                    Whatsapp
+                    WhatsApp
                   </a>
                 </li>
               </ul>
