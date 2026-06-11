@@ -1,5 +1,4 @@
 import CardTestimoni from "./CardTestimoni";
-import ContactForm from "./ContactForm";
 import MotionReveal from "./MotionReveal";
 
 type Testimonial = {
@@ -75,17 +74,6 @@ export default function TestimoniSection({
           </MotionReveal>
         )}
 
-        {/* Contact Heading */}
-        <MotionReveal
-          className="mt-16 text-center text-3xl font-extrabold leading-tight text-gray-800 sm:mt-24 sm:text-5xl md:text-6xl"
-        >
-          Siap untuk <span className="text-[#173472]">Kita Bantu?</span>
-        </MotionReveal>
-
-        {/* Form */}
-        <MotionReveal delay={0.08}>
-          <ContactForm />
-        </MotionReveal>
       </div>
     </section>
   );

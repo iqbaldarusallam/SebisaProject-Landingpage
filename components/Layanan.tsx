@@ -4,52 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { WHATSAPP_CONSULTATION_URL } from "@/lib/whatsapp";
 
-const services = [
-  {
-    title: "Website Professional",
-    desc: "Pembuatan website profesional yang dirancang khusus untuk meningkatkan kredibilitas bisnis, memperkuat branding, serta memudahkan pelanggan dalam mendapatkan informasi mengenai produk dan layanan perusahaan. Website dikembangkan dengan tampilan modern, responsif di semua perangkat, optimasi SEO dasar, performa yang cepat, serta struktur yang disesuaikan dengan kebutuhan bisnis agar mampu memberikan pengalaman pengguna yang optimal.",
-  },
-  {
-    title: "Landing Page & Payment Gateway",
-    desc: "Pembuatan landing page yang fokus pada peningkatan konversi penjualan, promosi produk, maupun pengumpulan leads pelanggan secara efektif. Setiap landing page dirancang dengan tampilan yang menarik, call-to-action yang jelas, serta integrasi payment gateway untuk memudahkan proses transaksi online secara aman, cepat, dan profesional sehingga mendukung peningkatan penjualan bisnis secara digital.",
-  },
-  {
-    title: "Pengelolaan Media Sosial",
-    desc: "Layanan pengelolaan media sosial secara profesional untuk membantu bisnis membangun branding, meningkatkan engagement, dan memperluas jangkauan audiens di berbagai platform digital seperti Instagram, TikTok, dan Facebook. Pengelolaan meliputi perencanaan konten, penjadwalan posting, copywriting, desain visual, analisis performa akun, hingga strategi komunikasi yang disesuaikan dengan target pasar bisnis.",
-  },
-  {
-    title: "Pengelolaan Iklan Digital",
-    desc: "Layanan perencanaan dan pengelolaan iklan digital yang bertujuan meningkatkan awareness, traffic, hingga penjualan bisnis melalui platform seperti Meta Ads, Instagram Ads, Facebook Ads, dan Google Ads. Strategi iklan dirancang berdasarkan target audiens yang spesifik, pengelolaan budget yang optimal, pembuatan materi iklan yang menarik, serta monitoring performa iklan secara berkala untuk memperoleh hasil yang maksimal.",
-  },
-  {
-    title: "Konten & Video Professional",
-    desc: "Pembuatan konten visual dan video profesional yang mampu meningkatkan daya tarik brand serta memperkuat komunikasi bisnis kepada pelanggan. Layanan mencakup produksi foto produk, video promosi, video cinematic, reels media sosial, hingga editing profesional dengan konsep kreatif yang disesuaikan dengan identitas dan kebutuhan branding perusahaan agar lebih menarik dan kompetitif di era digital.",
-  },
-  {
-    title: "Pengelolaan Media Isu & Kasus Berita",
-    desc: "Layanan pengelolaan media untuk isu, kasus, atau pemberitaan tertentu dengan output berupa press release dan video pendek aktual. Materi dikembangkan dari liputan kasus, rangkuman isu, serta headline yang diangkat dari statement ahli agar pesan utama tersampaikan secara jelas, terarah, dan relevan untuk kebutuhan publikasi.",
-  },
-  {
-    title: "Liputan Persidangan & Konferensi Pers",
-    desc: "Layanan liputan berita untuk persidangan, konferensi pers, dan agenda resmi lainnya dengan dokumentasi aktual. Output dapat berupa live streaming, video pendek, rangkuman berita, serta materi publikasi yang disusun cepat dan rapi untuk kebutuhan media, brand, organisasi, maupun perusahaan.",
-  },
-  {
-    title: "Desain Grafis, Logo & Mockup Branding",
-    desc: "Pembuatan desain grafis untuk kebutuhan identitas brand, logo, mockup produk, dan materi visual bisnis. Layanan ini membantu brand memiliki tampilan yang lebih profesional, konsisten, dan mudah dikenali melalui konsep visual yang disesuaikan dengan karakter produk atau perusahaan.",
-  },
-  {
-    title: "Pengelolaan Media YouTube",
-    desc: "Layanan pengelolaan media YouTube mulai dari perencanaan konten, produksi atau editing video, optimasi judul dan deskripsi, thumbnail, penjadwalan upload, hingga evaluasi performa channel. Tujuannya membantu brand membangun kanal video yang lebih rapi, aktif, dan relevan dengan audiens.",
-  },
-  {
-    title: "Pembuatan Company Profile Perusahaan",
-    desc: "Pembuatan company profile perusahaan dalam bentuk narasi, desain visual, dan materi presentasi yang profesional. Company profile disusun untuk memperkenalkan identitas, layanan, keunggulan, portofolio, dan kredibilitas perusahaan agar lebih siap digunakan untuk kebutuhan proposal, kerja sama, maupun presentasi bisnis.",
-  },
-  {
-    title: "Marketplace & Toko Online",
-    desc: "Pengembangan dan pengelolaan marketplace maupun toko online untuk membantu bisnis meningkatkan penjualan secara digital melalui platform e-commerce. Layanan meliputi setup toko online, optimasi tampilan produk, pengelolaan katalog, integrasi pembayaran, strategi promosi marketplace, serta pendampingan pengelolaan toko agar bisnis lebih mudah menjangkau pelanggan dan meningkatkan performa penjualan online.",
-  },
-];
+type Service = {
+  id: number;
+  title: string;
+  description: string;
+};
 
 const whyStats = [
   {
@@ -81,7 +40,7 @@ const whyStats = [
   },
 ];
 
-const Layanan = () => {
+const Layanan = ({ services }: { services: Service[] }) => {
   const reduceMotion = useReducedMotion();
 
   return (
@@ -104,7 +63,7 @@ const Layanan = () => {
             <ServiceCard
               key={item.title}
               delay={i * 0.12}
-              description={item.desc}
+              description={item.description}
               reduceMotion={Boolean(reduceMotion)}
               title={item.title}
             />

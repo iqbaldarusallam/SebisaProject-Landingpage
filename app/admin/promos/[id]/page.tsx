@@ -18,6 +18,7 @@ interface Promo {
   discountValue: number;
   code: string;
   isActive: boolean;
+  showCountdown: boolean;
   startDate: string;
   endDate: string;
   packageIds: number[];
@@ -45,6 +46,7 @@ export default function PromoFormPage() {
     discountValue: 0,
     code: "",
     isActive: true,
+    showCountdown: true,
     startDate: "",
     endDate: "",
     packageIds: [],
@@ -102,6 +104,7 @@ export default function PromoFormPage() {
           discountValue: data.data.discountValue ?? 0,
           code: data.data.code ?? "",
           isActive: data.data.isActive ?? true,
+          showCountdown: data.data.showCountdown ?? true,
           startDate: data.data.startDate
             ? String(data.data.startDate).slice(0, 16)
             : "",
@@ -306,6 +309,29 @@ export default function PromoFormPage() {
             />
 
             <span className="text-gray-700">Active</span>
+          </label>
+        </FormField>
+
+        <FormField label="Countdown Promo">
+          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <input
+              type="checkbox"
+              checked={Boolean(formData.showCountdown)}
+              onChange={(e) =>
+                handleChange("showCountdown", e.target.checked)
+              }
+              className="mt-1 h-4 w-4"
+            />
+
+            <span>
+              <span className="block text-sm font-semibold text-slate-800">
+                Tampilkan countdown dan tombol claim di navbar
+              </span>
+              <span className="text-xs leading-relaxed text-slate-500">
+                Jika dimatikan, kupon tetap bisa aktif sesuai tanggal, tetapi
+                countdown promo tidak ditampilkan di halaman publik.
+              </span>
+            </span>
           </label>
         </FormField>
 

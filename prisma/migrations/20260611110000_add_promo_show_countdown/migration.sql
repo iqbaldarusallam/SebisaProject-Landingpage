@@ -1,0 +1,1 @@
+ALTER TABLE "Promo" ADD COLUMN "showCountdown" BOOLEAN NOT NULL DEFAULT true;

@@ -42,6 +42,9 @@ const Footer = () => {
                   Branding Produk
                 </li>
                 <li className="hover:text-white cursor-pointer">
+                  Merchandise Brand
+                </li>
+                <li className="hover:text-white cursor-pointer">
                   Media YouTube
                 </li>
                 <li className="hover:text-white cursor-pointer">
@@ -58,7 +61,11 @@ const Footer = () => {
                   Tentang Kami
                 </li>
                 <li className="hover:text-white cursor-pointer">Tim Kami</li>
-                <li className="hover:text-white cursor-pointer">Portofolio</li>
+                <li>
+                  <Link href="/#portofolio" className="hover:text-white">
+                    Portofolio
+                  </Link>
+                </li>
                 <li className="hover:text-white cursor-pointer">Blog</li>
               </ul>
             </div>

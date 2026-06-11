@@ -44,6 +44,7 @@ export const promoSchema = z.object({
   discountType: z.enum(["percentage", "fixed"]).default("percentage"),
   discountValue: z.coerce.number().positive("Discount must be positive"),
   isActive: z.boolean().default(true),
+  showCountdown: z.boolean().default(true),
   startDate: z
     .string()
     .optional()
@@ -76,6 +77,36 @@ export const trustedBrandSchema = z.object({
       (value) => value.includes("res.cloudinary.com"),
       "Image must be uploaded to Cloudinary",
     ),
+});
+
+export const portfolioSchema = z.object({
+  brand: z
+    .string()
+    .trim()
+    .min(1, "Nama brand wajib diisi")
+    .max(80, "Nama brand maksimal 80 karakter"),
+  image: z
+    .string()
+    .url("Gambar harus berupa URL Cloudinary yang valid")
+    .refine(
+      (value) => value.includes("res.cloudinary.com"),
+      "Gambar wajib diupload ke Cloudinary",
+    ),
+});
+
+export const serviceSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(1, "Nama layanan wajib diisi")
+    .max(120, "Nama layanan maksimal 120 karakter"),
+  description: z
+    .string()
+    .trim()
+    .min(1, "Deskripsi layanan wajib diisi")
+    .max(1200, "Deskripsi layanan maksimal 1200 karakter"),
+  displayOrder: z.coerce.number().int().min(0).default(0),
+  isActive: z.boolean().default(true),
 });
 
 export const adminCreateSchema = z.object({

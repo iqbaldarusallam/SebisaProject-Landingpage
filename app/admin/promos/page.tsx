@@ -18,6 +18,9 @@ interface Promo {
   discountValue: number;
   code: string;
   isActive: boolean;
+  showCountdown: boolean;
+  startDate?: string | null;
+  endDate?: string | null;
   createdAt: string;
   packages?: Array<{
     packageId: number;
@@ -98,7 +101,28 @@ export default function PromosPage() {
     {
       key: "isActive" as const,
       label: "Status",
-      render: (v) => (Boolean(v) ? "Active" : "Inactive"),
+      render: (v, row) => {
+        const expired = row.endDate ? new Date(row.endDate) < new Date() : false;
+        if (expired) return "Berakhir";
+        return Boolean(v) ? "Aktif" : "Nonaktif";
+      },
+    },
+    {
+      key: "showCountdown" as const,
+      label: "Countdown",
+      render: (v, row) => {
+        const now = new Date();
+        const hasEndDate = Boolean(row.endDate);
+        const expired = row.endDate ? new Date(row.endDate) < now : false;
+        const notStarted = row.startDate ? new Date(row.startDate) > now : false;
+
+        if (!v) return "Disembunyikan";
+        if (!row.isActive) return "Nonaktif";
+        if (!hasEndDate) return "Butuh End Date";
+        if (expired) return "Berakhir";
+        if (notStarted) return "Terjadwal";
+        return "Tampil";
+      },
     },
     {
       key: "packages" as const,
@@ -147,7 +171,9 @@ export default function PromosPage() {
           promo.description,
           promo.discountType,
           promo.discountValue,
-          promo.isActive ? "Active" : "Inactive",
+          promo.isActive ? "Aktif" : "Nonaktif",
+          promo.showCountdown ? "Countdown tampil" : "Countdown disembunyikan",
+          promo.endDate,
           promo.packages?.length
             ? promo.packages
                 .map((item) => item.package?.name)
@@ -165,7 +191,8 @@ export default function PromosPage() {
             promo.discountType === "percentage"
               ? `${promo.discountValue}%`
               : promo.discountValue,
-          Status: promo.isActive ? "Active" : "Inactive",
+          Status: promo.isActive ? "Aktif" : "Nonaktif",
+          Countdown: promo.showCountdown ? "Tampil" : "Disembunyikan",
           Paket: promo.packages?.length
             ? promo.packages
                 .map((item) => item.package?.name)

@@ -1,0 +1,28 @@
+CREATE TABLE "Service" (
+  "id" SERIAL NOT NULL,
+  "title" TEXT NOT NULL,
+  "description" TEXT NOT NULL,
+  "displayOrder" INTEGER NOT NULL DEFAULT 0,
+  "isActive" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL,
+
+  CONSTRAINT "Service_pkey" PRIMARY KEY ("id")
+);
+
+CREATE INDEX "Service_displayOrder_idx" ON "Service"("displayOrder");
+CREATE INDEX "Service_isActive_idx" ON "Service"("isActive");
+
+INSERT INTO "Service" ("title", "description", "displayOrder", "isActive", "updatedAt") VALUES
+('Website Professional', 'Pembuatan website profesional yang dirancang khusus untuk meningkatkan kredibilitas bisnis, memperkuat branding, serta memudahkan pelanggan dalam mendapatkan informasi mengenai produk dan layanan perusahaan. Website dikembangkan dengan tampilan modern, responsif di semua perangkat, optimasi SEO dasar, performa yang cepat, serta struktur yang disesuaikan dengan kebutuhan bisnis agar mampu memberikan pengalaman pengguna yang optimal.', 1, true, CURRENT_TIMESTAMP),
+('Landing Page & Payment Gateway', 'Pembuatan landing page yang fokus pada peningkatan konversi penjualan, promosi produk, maupun pengumpulan leads pelanggan secara efektif. Setiap landing page dirancang dengan tampilan yang menarik, call-to-action yang jelas, serta integrasi payment gateway untuk memudahkan proses transaksi online secara aman, cepat, dan profesional sehingga mendukung peningkatan penjualan bisnis secara digital.', 2, true, CURRENT_TIMESTAMP),
+('Pengelolaan Media Sosial', 'Layanan pengelolaan media sosial secara profesional untuk membantu bisnis membangun branding, meningkatkan engagement, dan memperluas jangkauan audiens di berbagai platform digital seperti Instagram, TikTok, dan Facebook. Pengelolaan meliputi perencanaan konten, penjadwalan posting, copywriting, desain visual, analisis performa akun, hingga strategi komunikasi yang disesuaikan dengan target pasar bisnis.', 3, true, CURRENT_TIMESTAMP),
+('Pengelolaan Iklan Digital', 'Layanan perencanaan dan pengelolaan iklan digital yang bertujuan meningkatkan awareness, traffic, hingga penjualan bisnis melalui platform seperti Meta Ads, Instagram Ads, Facebook Ads, dan Google Ads. Strategi iklan dirancang berdasarkan target audiens yang spesifik, pengelolaan budget yang optimal, pembuatan materi iklan yang menarik, serta monitoring performa iklan secara berkala untuk memperoleh hasil yang maksimal.', 4, true, CURRENT_TIMESTAMP),
+('Konten & Video Professional', 'Pembuatan konten visual dan video profesional yang mampu meningkatkan daya tarik brand serta memperkuat komunikasi bisnis kepada pelanggan. Layanan mencakup produksi foto produk, video promosi, video cinematic, reels media sosial, hingga editing profesional dengan konsep kreatif yang disesuaikan dengan identitas dan kebutuhan branding perusahaan agar lebih menarik dan kompetitif di era digital.', 5, true, CURRENT_TIMESTAMP),
+('Pengelolaan Media Isu & Kasus Berita', 'Layanan pengelolaan media untuk isu, kasus, atau pemberitaan tertentu dengan output berupa press release dan video pendek aktual. Materi dikembangkan dari liputan kasus, rangkuman isu, serta headline yang diangkat dari statement ahli agar pesan utama tersampaikan secara jelas, terarah, dan relevan untuk kebutuhan publikasi.', 6, true, CURRENT_TIMESTAMP),
+('Liputan Persidangan & Konferensi Pers', 'Layanan liputan berita untuk persidangan, konferensi pers, dan agenda resmi lainnya dengan dokumentasi aktual. Output dapat berupa live streaming, video pendek, rangkuman berita, serta materi publikasi yang disusun cepat dan rapi untuk kebutuhan media, brand, organisasi, maupun perusahaan.', 7, true, CURRENT_TIMESTAMP),
+('Desain Grafis, Logo & Mockup Branding', 'Pembuatan desain grafis untuk kebutuhan identitas brand, logo, mockup produk, dan materi visual bisnis. Layanan ini membantu brand memiliki tampilan yang lebih profesional, konsisten, dan mudah dikenali melalui konsep visual yang disesuaikan dengan karakter produk atau perusahaan.', 8, true, CURRENT_TIMESTAMP),
+('Merchandise Kaos, Tumbler & Souvenir Brand', 'Pembuatan merchandise custom untuk kebutuhan promosi, komunitas, event, campaign, maupun identitas bisnis. Layanan mencakup desain dan produksi kaos, tumbler, tote bag, mug, stiker, packaging sederhana, serta souvenir brand lainnya agar bisnis memiliki media promosi fisik yang lebih menarik, fungsional, dan mudah diingat oleh pelanggan.', 9, true, CURRENT_TIMESTAMP),
+('Pengelolaan Media YouTube', 'Layanan pengelolaan media YouTube mulai dari perencanaan konten, produksi atau editing video, optimasi judul dan deskripsi, thumbnail, penjadwalan upload, hingga evaluasi performa channel. Tujuannya membantu brand membangun kanal video yang lebih rapi, aktif, dan relevan dengan audiens.', 10, true, CURRENT_TIMESTAMP),
+('Pembuatan Company Profile Perusahaan', 'Pembuatan company profile perusahaan dalam bentuk narasi, desain visual, dan materi presentasi yang profesional. Company profile disusun untuk memperkenalkan identitas, layanan, keunggulan, portofolio, dan kredibilitas perusahaan agar lebih siap digunakan untuk kebutuhan proposal, kerja sama, maupun presentasi bisnis.', 11, true, CURRENT_TIMESTAMP),
+('Marketplace & Toko Online', 'Pengembangan dan pengelolaan marketplace maupun toko online untuk membantu bisnis meningkatkan penjualan secara digital melalui platform e-commerce. Layanan meliputi setup toko online, optimasi tampilan produk, pengelolaan katalog, integrasi pembayaran, strategi promosi marketplace, serta pendampingan pengelolaan toko agar bisnis lebih mudah menjangkau pelanggan dan meningkatkan performa penjualan online.', 12, true, CURRENT_TIMESTAMP);

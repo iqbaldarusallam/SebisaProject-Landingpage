@@ -1,12 +1,19 @@
 import { prisma } from "@/lib/db";
 import { promoSchema } from "@/lib/validations";
 import { successResponse, errorResponse, parseRouteId } from "@/lib/api-utils";
+import {
+  expireEndedPromos,
+  findBlockingCountdownPromo,
+  getCountdownConflictMessage,
+} from "@/lib/promo-expiration";
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    await expireEndedPromos();
+
     const id = await parseRouteId(params);
     if (!id) {
       return Response.json(errorResponse("Invalid promo id"), { status: 400 });
@@ -37,6 +44,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const now = new Date();
+    await expireEndedPromos(now);
+
     const id = await parseRouteId(params);
     if (!id) {
       return Response.json(errorResponse("Invalid promo id"), { status: 400 });
@@ -54,13 +64,29 @@ export async function PUT(
 
     const { packageIds, ...promoData } = parsed.data;
 
+    const endDate = promoData.endDate ? new Date(promoData.endDate) : undefined;
     const preparedData = {
       ...promoData,
       startDate: promoData.startDate
         ? new Date(promoData.startDate)
         : undefined,
-      endDate: promoData.endDate ? new Date(promoData.endDate) : undefined,
+      endDate,
+      isActive: endDate && endDate < now ? false : promoData.isActive,
     };
+
+    const blockingPromo = await findBlockingCountdownPromo({
+      endDate,
+      excludeId: id,
+      isActive: Boolean(preparedData.isActive),
+      now,
+      showCountdown: Boolean(preparedData.showCountdown),
+    });
+
+    if (blockingPromo) {
+      return Response.json(errorResponse(getCountdownConflictMessage(blockingPromo)), {
+        status: 409,
+      });
+    }
 
     const promo = await prisma.promo.update({
       where: { id },

@@ -55,6 +55,7 @@ model Promo {
   maxUsage      Int?
   currentUsage  Int       @default(0)
   isActive      Boolean   @default(true)
+  showCountdown Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -81,6 +82,19 @@ model LandingContent {
   @@map("landing_contents")
 }
 
+model Service {
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([displayOrder])
+  @@index([isActive])
+}
+
 model PromoPackage {
   id        Int @id @default(autoincrement())
   promoId   Int
@@ -105,6 +119,16 @@ model Testimonial {
 }
 
 model TrustedBrand {
+  id        Int      @id @default(autoincrement())
+  brand     String
+  image     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+model Portfolio {
   id        Int      @id @default(autoincrement())
   brand     String
   image     String

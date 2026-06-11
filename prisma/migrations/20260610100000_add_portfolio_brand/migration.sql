@@ -1,0 +1,3 @@
+ALTER TABLE "Portfolio" ADD COLUMN "brand" TEXT NOT NULL DEFAULT 'Portofolio';
+
+ALTER TABLE "Portfolio" ALTER COLUMN "brand" DROP DEFAULT;

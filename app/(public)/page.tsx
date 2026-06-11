@@ -1,6 +1,8 @@
 import Hero from "@/components/Hero";
+import ContactSection from "@/components/ContactSection";
 import Layanan from "@/components/Layanan";
 import PacketSection from "@/components/PacketSection";
+import PortfolioSection from "@/components/PortfolioSection";
 import TestimoniSection from "@/components/TestimoniSection";
 import { prisma } from "@/lib/db";
 
@@ -18,15 +20,33 @@ const defaultHeroContent = {
 };
 
 export default async function Home() {
-  const [testimonials, trustedBrands, landingContent] = await Promise.all([
-    prisma.testimonial.findMany({
-      orderBy: { id: "asc" },
-    }),
-    prisma.trustedBrand.findMany({
-      orderBy: { id: "asc" },
-    }),
-    prisma.landingContent.findFirst(),
-  ]);
+  const [testimonials, trustedBrands, portfolios, services, landingContent] =
+    await Promise.all([
+      prisma.testimonial.findMany({
+        orderBy: { id: "asc" },
+      }),
+      prisma.trustedBrand.findMany({
+        orderBy: { id: "asc" },
+      }),
+      prisma.portfolio.findMany({
+        orderBy: { id: "asc" },
+        select: {
+          id: true,
+          brand: true,
+          image: true,
+        },
+      }),
+      prisma.service.findMany({
+        where: { isActive: true },
+        orderBy: [{ displayOrder: "asc" }, { id: "asc" }],
+        select: {
+          id: true,
+          title: true,
+          description: true,
+        },
+      }),
+      prisma.landingContent.findFirst(),
+    ]);
 
   return (
     <div>
@@ -34,9 +54,11 @@ export default async function Home() {
         trustedBrands={trustedBrands}
         heroContent={landingContent ?? defaultHeroContent}
       />
-      <Layanan />
+      <Layanan services={services} />
       <PacketSection />
       <TestimoniSection testimonials={testimonials} />
+      <PortfolioSection portfolios={portfolios} />
+      <ContactSection />
     </div>
   );
 }
