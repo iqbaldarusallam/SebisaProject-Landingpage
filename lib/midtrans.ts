@@ -1,17 +1,25 @@
-import { Snap } from "midtrans-client";
-import { createHash } from "crypto";
+import "server-only";
 
-type SnapWithTransaction = Snap & {
+import { createHash } from "crypto";
+import { Snap } from "midtrans-client";
+
+const isProduction = true;
+const serverKey = process.env.MIDTRANS_SERVER_KEY;
+const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY;
+
+if (!serverKey) {
+  throw new Error("MIDTRANS_SERVER_KEY is not configured");
+}
+
+const snap = new Snap({
+  isProduction,
+  serverKey,
+  clientKey: clientKey ?? "",
+}) as Snap & {
   transaction: {
     status(orderId: string): Promise<unknown>;
   };
 };
-
-const snap = new Snap({
-  isProduction: process.env.MIDTRANS_IS_PRODUCTION === "true",
-  serverKey: process.env.MIDTRANS_SERVER_KEY!,
-  clientKey: process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY ?? "",
-}) as SnapWithTransaction;
 
 export interface MidtransTransaction {
   transaction_details: {
@@ -29,35 +37,30 @@ export interface MidtransTransaction {
     price: number;
     quantity: number;
   }>;
+  notification_url?: string;
+  finish_redirect_url?: string;
   callbacks?: {
     finish?: string;
+  };
+}
+
+export function getMidtransConfig() {
+  return {
+    isProduction,
+    hasServerKey: Boolean(serverKey),
+    hasClientKey: Boolean(clientKey),
   };
 }
 
 export async function createMidtransTransaction(
   transaction: MidtransTransaction,
 ) {
-  try {
-    if (!process.env.MIDTRANS_SERVER_KEY) {
-      throw new Error("MIDTRANS_SERVER_KEY is not configured");
-    }
-
-    const response = await snap.createTransaction(transaction);
-    return response.token;
-  } catch (error) {
-    console.error("Midtrans error:", error);
-    throw error;
-  }
+  const response = await snap.createTransaction(transaction);
+  return response.token;
 }
 
 export async function getMidtransStatus(orderId: string) {
-  try {
-    const status = await snap.transaction.status(orderId);
-    return status;
-  } catch (error) {
-    console.error("Midtrans status error:", error);
-    throw error;
-  }
+  return snap.transaction.status(orderId);
 }
 
 export function verifyMidtransSignature(
@@ -66,8 +69,6 @@ export function verifyMidtransSignature(
   grossAmount: string,
   signature: string,
 ): boolean {
-  const serverKey = process.env.MIDTRANS_SERVER_KEY;
-
   if (!serverKey) {
     return false;
   }
@@ -77,4 +78,25 @@ export function verifyMidtransSignature(
     .digest("hex");
 
   return hash === signature;
+}
+
+export function sanitizeMidtransLog<T>(value: T): T {
+  if (!value || typeof value !== "object") return value;
+
+  const sensitiveKeys = new Set([
+    "serverKey",
+    "clientKey",
+    "signature_key",
+    "signatureKey",
+    "token",
+    "redirect_url",
+    "redirectUrl",
+  ]);
+
+  return JSON.parse(
+    JSON.stringify(value, (key, currentValue) => {
+      if (sensitiveKeys.has(key)) return "[redacted]";
+      return currentValue;
+    }),
+  ) as T;
 }
