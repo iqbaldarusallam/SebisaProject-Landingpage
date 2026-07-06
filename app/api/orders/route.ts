@@ -9,6 +9,23 @@ export async function GET() {
         items: true,
         package: true,
         promo: true,
+        paymentEvents: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: {
+            id: true,
+            transactionStatus: true,
+            fraudStatus: true,
+            grossAmount: true,
+            currency: true,
+            transactionTime: true,
+            settlementTime: true,
+            signatureVerified: true,
+            amountVerified: true,
+            verificationSource: true,
+            createdAt: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
