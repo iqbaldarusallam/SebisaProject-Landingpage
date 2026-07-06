@@ -139,28 +139,69 @@ model Portfolio {
 }
 
 model Order {
-  id            Int      @id @default(autoincrement())
-  customerEmail String
-  customerPhone String
-  customerName  String
-  packageId     Int?
-  promoId       Int?
-  totalPrice    Float
-  status        String   @default("pending")
-  transactionId String?
-  paymentProof  String?
-  followedUpAt  DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                      Int      @id @default(autoincrement())
+  customerEmail           String
+  customerPhone           String
+  customerName            String
+  packageId               Int?
+  promoId                 Int?
+  totalPrice              Float
+  status                  String   @default("pending")
+  transactionId           String?
+  paymentType             String?
+  midtransTransactionId   String?
+  midtransTransactionStatus String?
+  midtransFraudStatus     String?
+  midtransGrossAmount     Int?
+  midtransCurrency        String?
+  midtransTransactionTime DateTime?
+  midtransSettlementTime  DateTime?
+  midtransSignatureVerified Boolean?
+  midtransLastSyncedAt    DateTime?
+  paymentProof            String?
+  followedUpAt            DateTime?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 
-  package Package?    @relation(fields: [packageId], references: [id], onDelete: SetNull)
-  promo   Promo?      @relation(fields: [promoId], references: [id], onDelete: SetNull)
-  items   OrderItem[]
+  package       Package?              @relation(fields: [packageId], references: [id], onDelete: SetNull)
+  promo         Promo?                @relation(fields: [promoId], references: [id], onDelete: SetNull)
+  items         OrderItem[]
+  paymentEvents  MidtransPaymentEvent[]
 
   @@index([customerEmail])
   @@index([transactionId])
+  @@index([midtransTransactionId])
+  @@index([midtransTransactionStatus])
   @@index([status])
   @@index([followedUpAt])
+  @@index([createdAt])
+}
+
+model MidtransPaymentEvent {
+  id                   Int      @id @default(autoincrement())
+  orderId              Int
+  midtransOrderId      String
+  midtransTransactionId String
+  paymentType          String   @default("unknown")
+  transactionStatus    String
+  fraudStatus          String   @default("unknown")
+  grossAmount          Int
+  currency             String   @default("IDR")
+  transactionTime      DateTime?
+  settlementTime       DateTime?
+  signatureVerified    Boolean?
+  amountVerified       Boolean?
+  verificationSource   String   @default("webhook")
+  rawWebhook           Json
+  createdAt            DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([midtransOrderId, midtransTransactionId, transactionStatus, grossAmount, fraudStatus])
+  @@index([orderId])
+  @@index([midtransOrderId])
+  @@index([midtransTransactionId])
+  @@index([transactionStatus])
   @@index([createdAt])
 }
 
