@@ -28,7 +28,7 @@ export default function CardTestimoni({
     <motion.div
       whileHover={reduceMotion ? undefined : { y: -6 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="flex h-52.5 flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-lg transition-shadow duration-[400ms] hover:shadow-xl sm:h-75 sm:rounded-[22px] sm:p-6 md:h-67.5"
+      className="flex h-52.5 flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-lg transition-shadow duration-400 hover:shadow-xl sm:h-75 sm:rounded-[22px] sm:p-6 md:h-67.5"
     >
       {/* Stars */}
       <div className="mb-3 flex items-center gap-2 sm:mb-4">
