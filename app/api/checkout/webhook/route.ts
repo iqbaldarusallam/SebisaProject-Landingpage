@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { processCheckoutWebhook } from "@/lib/checkout-webhook";
 
 export const runtime = "nodejs";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+  "Access-Control-Allow-Methods": "POST,OPTIONS",
   "Access-Control-Allow-Headers":
-    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
+    "Content-Type, Accept, X-Requested-With, X-CSRF-Token, X-Api-Version",
 };
 
 export async function OPTIONS() {
@@ -20,21 +20,37 @@ export async function OPTIONS() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const result = await processCheckoutWebhook(body);
 
-    return NextResponse.json(result.response, {
-      status: result.status,
-      headers: corsHeaders,
+    after(async () => {
+      try {
+        const result = await processCheckoutWebhook(body);
+
+        if (result.status >= 400) {
+          console.warn("Midtrans webhook ignored", {
+            status: result.status,
+            message: result.response.message,
+          });
+        }
+      } catch (error) {
+        console.error(
+          "Checkout webhook processing error:",
+          error instanceof Error ? error.message : error,
+        );
+      }
     });
+
+    return NextResponse.json(
+      { ok: true, message: "Notification received" },
+      { status: 200, headers: corsHeaders },
+    );
   } catch (error) {
-    console.error("Checkout webhook error:", error);
+    console.error("Checkout webhook parse error:", error instanceof Error ? error.message : error);
     return NextResponse.json(
       {
         ok: false,
-        message:
-          error instanceof Error ? error.message : "Webhook processing failed",
+        message: "Invalid webhook payload",
       },
-      { status: 500, headers: corsHeaders },
+      { status: 400, headers: corsHeaders },
     );
   }
 }
