@@ -11,6 +11,25 @@ type CheckoutFailedProps = {
   }>;
 };
 
+const appBaseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+
+async function loadOrderStatus(orderId?: string) {
+  if (!orderId) return null;
+
+  try {
+    const response = await fetch(
+      `${appBaseUrl}/api/checkout/status/${encodeURIComponent(orderId)}`,
+      { cache: "no-store" },
+    );
+
+    if (!response.ok) return null;
+
+    return response.json() as Promise<{ ok: boolean; status?: string }>;
+  } catch {
+    return null;
+  }
+}
+
 function readParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
@@ -28,6 +47,10 @@ function getFailureMessage(reason?: string) {
     return "Transaksi dibatalkan atau ditolak oleh sistem pembayaran. Silakan coba lagi dengan metode pembayaran lain.";
   }
 
+  if (reason === "partial_refunded") {
+    return "Pembayaran sebelumnya sudah diproses sebagian oleh Midtrans. Silakan hubungi admin untuk tindak lanjut.";
+  }
+
   return "Pembayaran belum berhasil. Silakan ulangi checkout atau hubungi admin jika saldo sudah terpotong.";
 }
 
@@ -36,10 +59,12 @@ export default async function CheckoutFailed({
 }: CheckoutFailedProps) {
   const params = await searchParams;
   const orderId = readParam(params.orderId) ?? readParam(params.order_id);
-  const reason =
+  const reasonFromQuery =
     readParam(params.reason) ??
     readParam(params.status) ??
     readParam(params.transaction_status);
+  const backendStatus = await loadOrderStatus(orderId);
+  const reason = backendStatus?.status ?? reasonFromQuery;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#fff7f7] px-4 pb-16 pt-24 sm:pt-28">
