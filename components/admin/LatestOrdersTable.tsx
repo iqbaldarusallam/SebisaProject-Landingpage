@@ -27,6 +27,8 @@ const statusLabels: Record<string, string> = {
   failed: "Gagal",
   expired: "Expired",
   refunded: "Refund",
+  partial_refunded: "Partial Refund",
+  canceled: "Canceled",
 };
 
 function formatCurrency(amount: number) {
@@ -48,7 +50,9 @@ function formatDate(date: string) {
 function getStatusVariant(status: string): BadgeProps["variant"] {
   if (status === "paid") return "success";
   if (status === "pending") return "warning";
-  if (status === "failed" || status === "expired") return "destructive";
+  if (status === "failed" || status === "expired" || status === "canceled") {
+    return "destructive";
+  }
   return "secondary";
 }
 

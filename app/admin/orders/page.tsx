@@ -140,6 +140,8 @@ export default function OrdersPage() {
           failed: "Gagal",
           expired: "Expired",
           refunded: "Refund",
+          partial_refunded: "Partial Refund",
+          canceled: "Canceled",
         };
         const colorClass: Record<string, string> = {
           pending: "bg-amber-50 text-amber-700 ring-amber-100",
@@ -147,6 +149,8 @@ export default function OrdersPage() {
           failed: "bg-red-50 text-red-700 ring-red-100",
           expired: "bg-slate-100 text-slate-700 ring-slate-200",
           refunded: "bg-sky-50 text-sky-700 ring-sky-100",
+          partial_refunded: "bg-sky-50 text-sky-700 ring-sky-100",
+          canceled: "bg-rose-50 text-rose-700 ring-rose-100",
         };
         return (
           <span

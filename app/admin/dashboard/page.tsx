@@ -36,6 +36,8 @@ const statusLabels: Record<string, string> = {
   failed: "Gagal",
   expired: "Expired",
   refunded: "Refund",
+  partial_refunded: "Partial Refund",
+  canceled: "Canceled",
 };
 const statusChartColors: Record<string, string> = {
   pending: "#F59E0B",
@@ -43,6 +45,8 @@ const statusChartColors: Record<string, string> = {
   failed: "#EF4444",
   expired: "#64748B",
   refunded: "#0EA5E9",
+  partial_refunded: "#0284C7",
+  canceled: "#DC2626",
 };
 
 type StatCard = {
@@ -111,6 +115,10 @@ export default async function AdminDashboard() {
   const paidOrders = orders.filter((order) => order.status === paidStatus);
   const pendingOrders = orders.filter((order) => order.status === "pending");
   const expiredOrders = orders.filter((order) => order.status === "expired");
+  const cancelledOrders = orders.filter((order) => order.status === "canceled");
+  const refundedOrders = orders.filter((order) =>
+    order.status === "refunded" || order.status === "partial_refunded",
+  );
   const customerCount = new Set(
     orders.map((order) => order.customerEmail.trim().toLowerCase()),
   ).size;
@@ -373,7 +381,9 @@ export default async function AdminDashboard() {
             value={`${formatNumber(pendingOrders.length + expiredOrders.length)} order`}
             helper={`${formatNumber(pendingOrders.length)} pending, ${formatNumber(
               expiredOrders.length,
-            )} expired`}
+            )} expired, ${formatNumber(cancelledOrders.length)} canceled, ${formatNumber(
+              refundedOrders.length,
+            )} refund`}
           />
         </CardContent>
       </Card>

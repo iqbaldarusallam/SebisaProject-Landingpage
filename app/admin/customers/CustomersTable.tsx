@@ -95,6 +95,8 @@ export function CustomersTable({
             { label: "Gagal", value: "failed" },
             { label: "Expired", value: "expired" },
             { label: "Refund", value: "refunded" },
+            { label: "Partial Refund", value: "partial_refunded" },
+            { label: "Canceled", value: "canceled" },
           ],
           getValue: (customer) => customer.latestStatus,
         },
