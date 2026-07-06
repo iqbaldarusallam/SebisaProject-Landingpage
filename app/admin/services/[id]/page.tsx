@@ -130,7 +130,9 @@ export default function ServiceFormPage() {
           </div>
         )}
 
-        {isEdit && <TextInput label="Layanan ID" value={serviceId ?? ""} disabled />}
+        {isEdit && (
+          <TextInput label="Layanan ID" value={serviceId ?? ""} disabled />
+        )}
 
         <TextInput
           label="Nama Layanan"
@@ -144,9 +146,7 @@ export default function ServiceFormPage() {
         <TextArea
           label="Deskripsi Layanan"
           value={formData.description ?? ""}
-          onChange={(event) =>
-            handleChange("description", event.target.value)
-          }
+          onChange={(event) => handleChange("description", event.target.value)}
           error={errors.description}
           rows={8}
           maxLength={1200}
@@ -172,9 +172,7 @@ export default function ServiceFormPage() {
           <input
             type="checkbox"
             checked={Boolean(formData.isActive)}
-            onChange={(event) =>
-              handleChange("isActive", event.target.checked)
-            }
+            onChange={(event) => handleChange("isActive", event.target.checked)}
             className="size-4 accent-[#173472]"
           />
           <span>
